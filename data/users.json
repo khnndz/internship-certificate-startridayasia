@@ -1,0 +1,61 @@
+[
+  {
+    "id": "u001",
+    "name": "Ahmad Lazim",
+    "email": "ahmad@email.com",
+    "password": "$2a$10$8K1p/a0dR1xqM8K3hQy0D.X3qQ5NHf8DjYfT8VlqHkPS4e7mWH4CS",
+    "role": "user",
+    "status": "Aktif",
+    "certificates": [
+      {
+        "id": "cert001",
+        "title": "Sertifikat Magang Backend",
+        "file": "ahmad-backend.pdf",
+        "issuedAt": "2024-01-15"
+      },
+      {
+        "id": "cert1765875446016",
+        "title": "Internship",
+        "file": "ahmad-lazim-1765875446010.pdf",
+        "issuedAt": "2025-12-16"
+      },
+      {
+        "id": "cert1765875584685",
+        "title": "Sertifikat Magang ",
+        "file": "ahmad-lazim-1765875584628.pdf",
+        "issuedAt": "2025-12-16"
+      }
+    ]
+  },
+  {
+    "id": "u002",
+    "name": "Siti Nurhaliza",
+    "email": "siti@email.com",
+    "password": "$2a$10$8K1p/a0dR1xqM8K3hQy0D.X3qQ5NHf8DjYfT8VlqHkPS4e7mWH4CS",
+    "role": "user",
+    "status": "Aktif",
+    "certificates": [
+      {
+        "id": "cert002",
+        "title": "Sertifikat Magang Frontend",
+        "file": "siti-frontend.pdf",
+        "issuedAt": "2024-02-20"
+      },
+      {
+        "id": "cert003",
+        "title": "Sertifikat Magang UI/UX",
+        "file": "siti-uiux.pdf",
+        "issuedAt": "2024-03-10"
+      }
+    ]
+  },
+  {
+    "id": "admin001",
+    "name": "Administrator",
+    "email": "admin@email.com",
+    "password": "$2a$10$N9qo8uLOickgx2ZMRZoMy.MqrqC8/XvH3RjPHEMVpTOqkZ.7IvlRe",
+    "role": "admin",
+    "status": "Aktif",
+    "certificates": []
+  }
+]
