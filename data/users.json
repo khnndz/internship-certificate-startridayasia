@@ -1,37 +1,28 @@
 [
-  {
-    "id": "admin001",
-    "name": "Administrator",
-    "email": "admin@gmail.com",
-    "password": "$2a$10$N9qo8uLOickgx2ZMRZoMy.MqrqC8/XvH3RjPHEMVpTOqkZ.7IvlRe",
-    "role": "admin",
-    "status": "Aktif",
-    "certificates": []
-  },
-  {
-    "id": "admin002",
-    "name": "Super Admin",
-    "email": "superadmin@startfriday.asia",
-    "password": "$2a$10$t493HYl.NvxH.0KNa/uSe.sp3.w7mCY91ImWIBNRMyx/ptwHkCEAW",
-    "role": "admin",
-    "status": "Aktif",
-    "certificates": []
-  },
-  {
-    "id": "u1766325758995",
-    "name": "Ahmad Lazim",
-    "email": "lazimahmad431@gmail.com",
-    "password": "$2a$10$d1XVkm8RtMpmFzUmBxI/sOfuxFfGZ.IDvVj5NiJG14o7UCJG4/8jq",
-    "role": "user",
-    "status": "Selesai",
-    "certificates": [
-      {
-        "id": "cert1766325783081",
-        "title": "tetetete",
-        "file": "ahmad-lazim-1766325782709-99c2f4db-e2fd-491d-b069-26a1ef067db2.pdf",
-        "issuedAt": "2025-12-21",
-        "expiryDate": "2025-12-22"
-      }
-    ]
-  }
+    {
+        "id": "admin001",
+        "name": "Administrator",
+        "email": "admin@startfriday.asia",
+        "password": "$2a$10$X7U.e5.j.J.d.o.o.o.o.O.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o",
+        "role": "admin",
+        "status": "Aktif",
+        "certificates": []
+    },
+    {
+        "id": "u1",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "password": "$2a$10$X7U.e5.j.J.d.o.o.o.o.O.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o",
+        "role": "user",
+        "status": "Aktif",
+        "certificates": [
+            {
+                "id": "cert1",
+                "title": "Certificate of Completion",
+                "file": "john-doe-12345-uuid.pdf",
+                "issuedAt": "2025-01-01",
+                "expiryDate": "2026-01-01"
+            }
+        ]
+    }
 ]
