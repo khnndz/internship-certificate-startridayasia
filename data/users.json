@@ -18,23 +18,6 @@
     "certificates": []
   },
   {
-    "id": "u1766289685449",
-    "name": "Ahmad Lazim",
-    "email": "lazimahmad431@gmail.com",
-    "password": "$2a$10$U7TRt0S/3ng1X900J1wYB.s.7VeZwCmq0vW2tT8evGBXFcfxj7tI.",
-    "role": "user",
-    "status": "Aktif",
-    "certificates": [
-      {
-        "id": "cert1766289721926",
-        "title": "Test 123",
-        "file": "ahmad-lazim-1766289721923-b3b63a9f-8fb8-45f1-a7b6-d6d94926263f.pdf",
-        "issuedAt": "2025-12-21",
-        "expiryDate": "2025-12-22"
-      }
-    ]
-  },
-  {
     "id": "u1766290875335",
     "name": "Rejal Mahardika",
     "email": "rejal@gmail.com",
