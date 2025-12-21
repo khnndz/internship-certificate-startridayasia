@@ -3,7 +3,7 @@
         "id": "admin001",
         "name": "Administrator",
         "email": "admin@startfriday.asia",
-        "password": "$2a$10$X7U.e5.j.J.d.o.o.o.o.O.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o",
+        "password": "$2b$10$mZ1xngpYiQqgBLAOciiV1eKcWiVSHNEEvVNUU/3c/YMRSBKgWchh2C",
         "role": "admin",
         "status": "Aktif",
         "certificates": []
@@ -12,7 +12,7 @@
         "id": "u1",
         "name": "John Doe",
         "email": "john@example.com",
-        "password": "$2a$10$X7U.e5.j.J.d.o.o.o.o.O.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o",
+        "password": "$2b$10$gyvEFHGTj43LoOwvdVvksutNOBQLWHtiZ8vuUq9f5e.LIf6cR.T42",
         "role": "user",
         "status": "Aktif",
         "certificates": [
