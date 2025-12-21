@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { getUserById } from '@/lib/data';
+import { getUserById } from '@/lib/data-kv';
 
 export async function GET() {
   const session = await getSession();
@@ -12,7 +12,7 @@ export async function GET() {
     );
   }
 
-  const user = getUserById(session.id);
+  const user = await getUserById(session.id);
 
   return NextResponse.json({
     authenticated: true,

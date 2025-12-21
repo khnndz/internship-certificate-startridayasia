@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
-import { getUserById } from '@/lib/data';
+import { getUserById } from '@/lib/data-kv';
 import { Sidebar } from '@/components/Sidebar';
 
 export default async function AdminLayout({
@@ -14,7 +14,7 @@ export default async function AdminLayout({
     redirect('/login');
   }
 
-  const user = getUserById(session.id);
+  const user = await getUserById(session.id);
 
   if (!user) {
     redirect('/login');
@@ -30,8 +30,8 @@ export default async function AdminLayout({
             {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </div>
         </header>
-        <main className="p-6">
-          <div className="mx-auto w-full max-w-6xl">{children}</div>
+        <main className="px-6 lg:px-10 py-6 lg:py-8">
+          <div className="w-full">{children}</div>
         </main>
       </div>
     </div>

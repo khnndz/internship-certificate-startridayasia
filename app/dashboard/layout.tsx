@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
-import { getUserById } from '@/lib/data';
+import { getUserById } from '@/lib/data-kv';
 import { Navbar } from '@/components/Navbar';
+import { UserSidebar } from '@/components/UserSidebar';
 
 export default async function DashboardLayout({
   children,
@@ -14,7 +15,7 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
-  const user = getUserById(session.id);
+  const user = await getUserById(session.id);
 
   if (!user) {
     redirect('/login');
@@ -23,8 +24,13 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-background">
       <Navbar user={user} />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
+      <main className="px-4 sm:px-6 lg:px-10 py-8">
+        <div className="flex gap-6">
+          <UserSidebar />
+          <div className="flex-1">
+            {children}
+          </div>
+        </div>
       </main>
     </div>
   );

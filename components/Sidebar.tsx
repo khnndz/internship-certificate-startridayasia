@@ -19,6 +19,7 @@ export function Sidebar({ user }: SidebarProps) {
     { label: 'Dashboard', href: '/admin', icon: '📊' },
     { label: 'Users', href: '/admin/users', icon: '👥' },
     { label: 'Certificates', href: '/admin/upload-certificate', icon: '📜' },
+    { label: 'My Profile', href: '/admin/profile', icon: '👤' },
   ];
 
   return (

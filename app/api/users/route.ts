@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { getUsers } from '@/lib/data';
+import { getUsers } from '@/lib/data-kv';
 
 export async function GET() {
   const session = await getSession();
@@ -12,7 +12,7 @@ export async function GET() {
     );
   }
 
-  const users = getUsers();
+  const users = await getUsers();
   
   const safeUsers = users.map(user => ({
     id: user.id,

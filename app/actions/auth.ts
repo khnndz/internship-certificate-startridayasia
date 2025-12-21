@@ -2,7 +2,7 @@
 
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
-import { getUserByEmail } from '@/lib/data';
+import { getUserByEmail } from '@/lib/data-kv';
 import { createSession, setSessionCookie, clearSession } from '@/lib/auth';
 
 export async function loginAction(formData: FormData) {
@@ -13,7 +13,7 @@ export async function loginAction(formData: FormData) {
     return { error: 'Email dan password harus diisi' };
   }
 
-  const user = getUserByEmail(email);
+  const user = await getUserByEmail(email);
 
   if (!user) {
     return { error: 'Email atau password salah' };

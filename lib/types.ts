@@ -3,6 +3,7 @@ export interface Certificate {
   title: string;
   file: string;
   issuedAt: string;
+  expiryDate?: string;
 }
 
 export interface User {

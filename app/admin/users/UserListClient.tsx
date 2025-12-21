@@ -278,6 +278,9 @@ export default function UserListClient({ initialUsers }: UserListClientProps) {
                                 <div className="min-w-0">
                                   <p className="text-sm font-medium text-gray-900 truncate" title={cert.title}>{cert.title}</p>
                                   <p className="text-xs text-gray-500 truncate">{cert.file}</p>
+                                  {cert.expiryDate && (
+                                    <p className="text-xs text-amber-600 mt-0.5">Berlaku sampai: {cert.expiryDate}</p>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-2 flex-shrink-0">
                                   <a

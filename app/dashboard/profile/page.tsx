@@ -1,5 +1,5 @@
 import { getSession } from '@/lib/auth';
-import { getUserById } from '@/lib/data';
+import { getUserById } from '@/lib/data-kv';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -7,7 +7,7 @@ import { Avatar } from '@/components/ui/Avatar';
 
 export default async function ProfilePage() {
   const session = await getSession();
-  const user = session ? getUserById(session.id) : null;
+  const user = session ? await getUserById(session.id) : null;
 
   if (!user) {
     return <div>Loading...</div>;

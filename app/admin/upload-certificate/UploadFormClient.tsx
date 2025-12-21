@@ -17,6 +17,8 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [userSearch, setUserSearch] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const showMessage = (type: 'success' | 'error', text: string) => {
@@ -59,9 +61,11 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Upload Sertifikat</h1>
-        <p className="text-gray-500">Upload dan assign sertifikat ke user</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Upload Sertifikat</h1>
+          <p className="text-slate-600 text-sm">Upload dan assign sertifikat ke user magang.</p>
+        </div>
       </div>
 
       {message && (
@@ -74,52 +78,113 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1">
-          <Card>
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <span>📤</span> Form Upload
-              </h3>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div className="lg:col-span-2">
+          <Card className="border-slate-200 shadow-lg">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <span className="text-xl">📤</span> Form Upload Sertifikat
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">Lengkapi data di bawah ini untuk upload sertifikat PDF.</p>
+              </div>
             </div>
-            <div className="p-6">
-              <form id="upload-form" action={handleSubmit} className="space-y-5">
+            <div className="p-6 space-y-5">
+              <form
+                id="upload-form"
+                action={handleSubmit}
+                onSubmit={(e) => {
+                  if (!selectedUserId) {
+                    e.preventDefault();
+                    showMessage('error', 'Silakan pilih user dari hasil pencarian');
+                  }
+                }}
+                className="space-y-5"
+              >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Pilih User</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Pilih User</label>
+                  <input type="hidden" name="userId" value={selectedUserId} />
                   <input
                     type="text"
                     value={userSearch}
-                    onChange={(e) => setUserSearch(e.target.value)}
-                    className="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500 shadow-sm mb-2"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setUserSearch(value);
+                      setShowUserDropdown(true);
+                      if (!value.trim()) {
+                        setSelectedUserId('');
+                      }
+                    }}
+                    onFocus={() => setShowUserDropdown(true)}
+                    autoComplete="off"
+                    className="w-full rounded-lg border-2 border-slate-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm mb-2 bg-slate-50"
                     placeholder="Cari nama atau email..."
                   />
-                  <select name="userId" required className="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500 shadow-sm">
-                    <option value="">-- Pilih User --</option>
-                    {filteredUsers.map(user => (
-                      <option key={user.id} value={user.id}>
-                        {user.name} ({user.email})
-                      </option>
-                    ))}
-                  </select>
+                  {showUserDropdown && (
+                    <div className="max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-md text-sm">
+                      {filteredUsers.length > 0 ? (
+                        filteredUsers.map((user) => {
+                          const isSelected = selectedUserId === user.id;
+                          return (
+                            <button
+                              type="button"
+                              key={user.id}
+                              onClick={() => {
+                                setSelectedUserId(user.id);
+                                setUserSearch(`${user.name} (${user.email})`);
+                                setShowUserDropdown(false);
+                              }}
+                              className={`w-full text-left px-3 py-2 flex flex-col hover:bg-primary-50 transition-colors ${
+                                isSelected ? 'bg-primary-50 text-primary-700' : 'text-slate-700'
+                              }`}
+                            >
+                              <span className="font-medium truncate">{user.name}</span>
+                              <span className="text-xs text-slate-500 truncate">{user.email}</span>
+                            </button>
+                          );
+                        })
+                      ) : (
+                        <div className="px-3 py-2 text-slate-500">Tidak ada user ditemukan</div>
+                      )}
+                    </div>
+                  )}
+                  {selectedUserId && (
+                    <p className="mt-1 text-xs text-green-600">User terpilih akan menjadi penerima sertifikat.</p>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Judul Sertifikat</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Judul Sertifikat</label>
                   <input 
                     type="text" 
                     name="title" 
                     required 
-                    className="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500 shadow-sm"
+                    className="w-full rounded-lg border-2 border-slate-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm bg-white"
                     placeholder="Contoh: Sertifikat Magang Backend"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">File PDF</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">
+                    Tanggal Kadaluarsa (Opsional)
+                  </label>
+                  <input 
+                    type="date" 
+                    name="expiryDate" 
+                    className="w-full rounded-lg border-2 border-slate-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm bg-white"
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Sertifikat akan otomatis terhapus setelah tanggal ini
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">File PDF</label>
                   <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg transition-colors ${
                     selectedFiles.length > 0
                       ? 'border-primary-300 bg-primary-50'
-                      : 'border-gray-300 hover:border-primary-500'
+                      : 'border-slate-200 hover:border-primary-500 bg-slate-50'
                   }`}>
                     <div className="space-y-1 text-center">
                       <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
@@ -140,21 +205,21 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                           />
                         </label>
                       </div>
-                      <p className="text-xs text-gray-500">PDF hingga 10MB</p>
+                      <p className="text-xs text-slate-500">PDF hingga 10MB</p>
                     </div>
                   </div>
 
                   {selectedFiles.length > 0 && (
-                    <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
-                      <div className="text-sm font-medium text-gray-900 mb-2">File dipilih</div>
+                    <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
+                      <div className="text-sm font-medium text-slate-900 mb-2">File dipilih</div>
                       <div className="space-y-2">
                         {selectedFiles.map((f) => (
                           <div key={`${f.name}-${f.lastModified}`} className="flex items-center justify-between gap-2 text-sm">
                             <div className="min-w-0">
-                              <p className="font-medium text-gray-900 truncate">{f.name}</p>
-                              <p className="text-xs text-gray-500">{Math.ceil(f.size / 1024)} KB</p>
+                              <p className="font-medium text-slate-900 truncate">{f.name}</p>
+                              <p className="text-xs text-slate-500">{Math.ceil(f.size / 1024)} KB</p>
                             </div>
-                            <span className="text-xs font-semibold text-gray-600">PDF</span>
+                            <span className="text-xs font-semibold text-slate-600">PDF</span>
                           </div>
                         ))}
                       </div>
@@ -165,37 +230,22 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                 <Button 
                   type="submit" 
                   disabled={uploading}
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 text-white shadow-lg"
                 >
                   {uploading ? '⏳ Mengupload...' : '📤 Upload Sertifikat'}
                 </Button>
               </form>
             </div>
           </Card>
-
-          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4">
-            <div className="flex items-start space-x-3">
-              <span className="text-xl">ℹ️</span>
-              <div>
-                <h4 className="font-bold text-blue-900 text-sm">Informasi Upload</h4>
-                <ul className="text-blue-700 text-xs mt-2 space-y-1 list-disc list-inside">
-                  <li>File akan disimpan di folder <code className="bg-blue-100 px-1 rounded">/public/certificates/</code></li>
-                  <li>Nama file akan otomatis di-generate dengan format unik</li>
-                  <li>User dapat langsung download setelah sertifikat diupload</li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
-
-        <div className="lg:col-span-2">
-          <Card>
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+        <div className="lg:col-span-1">
+          <Card className="border-slate-200 shadow-lg">
+            <div className="p-6 border-b border-slate-100">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <span>📋</span> Daftar Sertifikat User
               </h3>
             </div>
-            <div className="p-6 space-y-3">
+            <div className="p-6 space-y-3 max-h-[480px] overflow-y-auto">
               {regularUsers.map((user) => {
                 const certCount = user.certificates?.length || 0;
                 return (
@@ -228,6 +278,9 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-gray-900 truncate" title={cert.title}>{cert.title}</p>
                                 <p className="text-xs text-gray-500 truncate">{cert.file}</p>
+                                {cert.expiryDate && (
+                                  <p className="text-xs text-amber-600 mt-0.5">Berlaku sampai: {cert.expiryDate}</p>
+                                )}
                               </div>
                               <a
                                 href={`/certificates/${cert.file}`}

@@ -1,10 +1,10 @@
-import { getUsers } from '@/lib/data';
+import { getUsers } from '@/lib/data-kv';
 import UploadFormClient from './UploadFormClient';
 
 export const dynamic = 'force-dynamic';
 
 export default async function UploadCertificatePage() {
-  const users = getUsers();
+  const users = await getUsers();
   
   return <UploadFormClient users={users} />;
 }

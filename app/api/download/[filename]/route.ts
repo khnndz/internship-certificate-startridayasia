@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { getUserById } from '@/lib/data';
+import { getUserById } from '@/lib/data-kv';
 import fs from 'fs';
 import path from 'path';
 
@@ -20,7 +20,7 @@ export async function GET(
     );
   }
 
-  const user = getUserById(session.id);
+  const user = await getUserById(session.id);
   
   if (!user) {
     return NextResponse.json(
