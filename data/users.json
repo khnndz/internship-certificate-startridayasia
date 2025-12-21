@@ -24,6 +24,14 @@
     "password": "$2a$10$d1XVkm8RtMpmFzUmBxI/sOfuxFfGZ.IDvVj5NiJG14o7UCJG4/8jq",
     "role": "user",
     "status": "Selesai",
-    "certificates": []
+    "certificates": [
+      {
+        "id": "cert1766325783081",
+        "title": "tetetete",
+        "file": "ahmad-lazim-1766325782709-99c2f4db-e2fd-491d-b069-26a1ef067db2.pdf",
+        "issuedAt": "2025-12-21",
+        "expiryDate": "2025-12-22"
+      }
+    ]
   }
 ]
