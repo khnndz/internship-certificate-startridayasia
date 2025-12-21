@@ -2,26 +2,10 @@
 
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import { getUserByEmail } from '@/lib/data-kv';
 import { createSession, setSessionCookie, clearSession } from '@/lib/auth';
-import { checkLoginRateLimit } from '@/lib/rate-limit';
 
 export async function loginAction(formData: FormData) {
-  // Get client IP for rate limiting
-  const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for')?.split(',')[0] || 
-             headersList.get('x-real-ip') || 
-             'unknown';
-  
-  // Check rate limit
-  const rateLimit = checkLoginRateLimit(ip);
-  if (!rateLimit.allowed) {
-    return { 
-      error: `Terlalu banyak percobaan login. Coba lagi dalam ${rateLimit.resetIn} detik.` 
-    };
-  }
-
   const email = (formData.get('email') as string)?.trim().toLowerCase();
   const password = formData.get('password') as string;
 

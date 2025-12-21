@@ -9,6 +9,15 @@
     "certificates": []
   },
   {
+    "id": "admin002",
+    "name": "Super Admin",
+    "email": "superadmin@startfriday.asia",
+    "password": "$2a$10$t493HYl.NvxH.0KNa/uSe.sp3.w7mCY91ImWIBNRMyx/ptwHkCEAW",
+    "role": "admin",
+    "status": "Aktif",
+    "certificates": []
+  },
+  {
     "id": "u1766289685449",
     "name": "Ahmad Lazim",
     "email": "lazimahmad431@gmail.com",
