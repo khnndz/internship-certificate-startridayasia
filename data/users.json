@@ -65,6 +65,14 @@
     "password": "$2a$10$IaoXkZgWUKGi.u.UDr8CP.W/NQPSISv9.hvt5mcyuQEknM27ZHuXe",
     "role": "user",
     "status": "Selesai",
-    "certificates": []
+    "certificates": [
+      {
+        "id": "cert1766325624830",
+        "title": "hahahaha",
+        "file": "test-1766325624423-b6dcca74-e43f-46c4-af1e-669ddaded0f8.pdf",
+        "issuedAt": "2025-12-21",
+        "expiryDate": "2025-12-22"
+      }
+    ]
   }
 ]
