@@ -57,5 +57,14 @@
         "expiryDate": "2025-12-23"
       }
     ]
+  },
+  {
+    "id": "u1766325570861",
+    "name": "test",
+    "email": "test@gmail.com",
+    "password": "$2a$10$IaoXkZgWUKGi.u.UDr8CP.W/NQPSISv9.hvt5mcyuQEknM27ZHuXe",
+    "role": "user",
+    "status": "Selesai",
+    "certificates": []
   }
 ]
