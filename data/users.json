@@ -16,5 +16,14 @@
     "role": "admin",
     "status": "Aktif",
     "certificates": []
+  },
+  {
+    "id": "u1766325758995",
+    "name": "Ahmad Lazim",
+    "email": "lazimahmad431@gmail.com",
+    "password": "$2a$10$d1XVkm8RtMpmFzUmBxI/sOfuxFfGZ.IDvVj5NiJG14o7UCJG4/8jq",
+    "role": "user",
+    "status": "Selesai",
+    "certificates": []
   }
 ]
