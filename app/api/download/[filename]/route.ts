@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { getUserById } from '@/lib/data-kv';
-import fs from 'fs';
-import path from 'path';
+import { getCertificateFile } from '@/lib/file-storage';
 
 export async function GET(
   request: NextRequest,
@@ -40,19 +39,20 @@ export async function GET(
     }
   }
 
-  const filePath = path.join(process.cwd(), 'public', 'certificates', filename);
-  
   try {
-    if (!fs.existsSync(filePath)) {
+    const fileBuffer = await getCertificateFile(filename);
+    
+    if (!fileBuffer) {
       return NextResponse.json(
         { error: 'File not found' },
         { status: 404 }
       );
     }
-
-    const fileBuffer = fs.readFileSync(filePath);
     
-    return new NextResponse(fileBuffer, {
+    // Convert Buffer to Uint8Array for NextResponse compatibility
+    const uint8Array = new Uint8Array(fileBuffer);
+    
+    return new NextResponse(uint8Array, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,

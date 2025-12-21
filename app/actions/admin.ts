@@ -6,17 +6,48 @@ import { revalidatePath } from 'next/cache';
 import { getUsers, saveUsers, generateUserId, generateCertificateId } from '@/lib/data-kv';
 import { User, Certificate } from '@/lib/types';
 import { getSession } from '@/lib/auth';
-import fs from 'fs';
-import path from 'path';
+import { saveCertificateFile, deleteCertificateFile } from '@/lib/file-storage';
+
+// Helper: Sanitize string input
+function sanitizeInput(input: string | null, maxLength: number = 255): string {
+  if (!input) return '';
+  return input.trim().slice(0, maxLength);
+}
+
+// Helper: Validate email format
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 255;
+}
+
+// Helper: Check admin session
+async function requireAdmin(): Promise<{ error?: string; session?: any }> {
+  const session = await getSession();
+  if (!session || session.role !== 'admin') {
+    return { error: 'Unauthorized: Admin access required' };
+  }
+  return { session };
+}
 
 export async function createUserAction(formData: FormData) {
-  const name = formData.get('name') as string;
-  const email = formData.get('email') as string;
+  const { error: authError } = await requireAdmin();
+  if (authError) return { error: authError };
+
+  const name = sanitizeInput(formData.get('name') as string, 100);
+  const email = sanitizeInput(formData.get('email') as string, 255).toLowerCase();
   const password = formData.get('password') as string;
-  const status = formData.get('status') as string || 'Aktif';
+  const status = sanitizeInput(formData.get('status') as string, 50) || 'Aktif';
 
   if (!name || !email || !password) {
     return { error: 'Semua field harus diisi' };
+  }
+
+  if (!isValidEmail(email)) {
+    return { error: 'Format email tidak valid' };
+  }
+
+  if (password.length < 6 || password.length > 128) {
+    return { error: 'Password harus 6-128 karakter' };
   }
 
   const users = await getUsers();
@@ -49,14 +80,25 @@ export async function createUserAction(formData: FormData) {
 }
 
 export async function updateUserAction(formData: FormData) {
-  const id = formData.get('id') as string;
-  const name = formData.get('name') as string;
-  const email = formData.get('email') as string;
+  const { error: authError } = await requireAdmin();
+  if (authError) return { error: authError };
+
+  const id = sanitizeInput(formData.get('id') as string, 50);
+  const name = sanitizeInput(formData.get('name') as string, 100);
+  const email = sanitizeInput(formData.get('email') as string, 255).toLowerCase();
   const password = formData.get('password') as string;
-  const status = formData.get('status') as string;
+  const status = sanitizeInput(formData.get('status') as string, 50);
 
   if (!id || !name || !email) {
     return { error: 'Data tidak lengkap' };
+  }
+
+  if (!isValidEmail(email)) {
+    return { error: 'Format email tidak valid' };
+  }
+
+  if (password && (password.length < 6 || password.length > 128)) {
+    return { error: 'Password harus 6-128 karakter' };
   }
 
   const users = await getUsers();
@@ -95,10 +137,18 @@ export async function updateUserAction(formData: FormData) {
 }
 
 export async function deleteUserAction(formData: FormData) {
-  const id = formData.get('id') as string;
+  const { error: authError, session } = await requireAdmin();
+  if (authError) return { error: authError };
+
+  const id = sanitizeInput(formData.get('id') as string, 50);
 
   if (!id) {
     return { error: 'ID user tidak valid' };
+  }
+
+  // Prevent admin from deleting themselves
+  if (session?.id === id) {
+    return { error: 'Tidak dapat menghapus akun sendiri' };
   }
 
   const users = await getUsers();
@@ -115,10 +165,7 @@ export async function deleteUserAction(formData: FormData) {
 
   for (const fileName of certificateFiles) {
     try {
-      const filePath = path.join(process.cwd(), 'public', 'certificates', fileName);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
+      await deleteCertificateFile(fileName);
     } catch (error) {
       console.error('Error deleting certificate file:', error);
     }
@@ -185,8 +232,13 @@ export async function updateAdminProfileAction(formData: FormData) {
 }
 
 export async function uploadCertificateAction(formData: FormData) {
-  const userId = formData.get('userId') as string;
-  const title = formData.get('title') as string;  const expiryDate = formData.get('expiryDate') as string;  const files = formData
+  const { error: authError } = await requireAdmin();
+  if (authError) return { error: authError };
+
+  const userId = sanitizeInput(formData.get('userId') as string, 50);
+  const title = sanitizeInput(formData.get('title') as string, 200);
+  const expiryDate = sanitizeInput(formData.get('expiryDate') as string, 20);
+  const files = formData
     .getAll('file')
     .filter((f): f is File => typeof (f as any)?.arrayBuffer === 'function' && typeof (f as any)?.name === 'string');
 
@@ -194,8 +246,20 @@ export async function uploadCertificateAction(formData: FormData) {
     return { error: 'Semua field harus diisi' };
   }
 
+  // Validate file extensions
   if (files.some((f) => !f.name.toLowerCase().endsWith('.pdf'))) {
     return { error: 'File harus berformat PDF' };
+  }
+
+  // Validate file sizes (max 10MB per file)
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  if (files.some((f) => f.size > MAX_FILE_SIZE)) {
+    return { error: 'Ukuran file maksimal 10MB per file' };
+  }
+
+  // Limit number of files per upload
+  if (files.length > 10) {
+    return { error: 'Maksimal 10 file per upload' };
   }
 
   const users = await getUsers();
@@ -208,12 +272,6 @@ export async function uploadCertificateAction(formData: FormData) {
   const timestamp = Date.now();
   const sanitizedName = users[userIndex].name.toLowerCase().replace(/\s+/g, '-');
 
-  const certificatesDir = path.join(process.cwd(), 'public', 'certificates');
-  
-  if (!fs.existsSync(certificatesDir)) {
-    fs.mkdirSync(certificatesDir, { recursive: true });
-  }
-
   const issuedAt = new Date().toISOString().split('T')[0];
   const newCertificates: Certificate[] = [];
   const writtenFiles: string[] = [];
@@ -222,10 +280,14 @@ export async function uploadCertificateAction(formData: FormData) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const fileName = `${sanitizedName}-${timestamp}-${randomUUID()}.pdf`;
-      const filePath = path.join(certificatesDir, fileName);
 
       const buffer = Buffer.from(await file.arrayBuffer());
-      fs.writeFileSync(filePath, buffer);
+      const saved = await saveCertificateFile(fileName, buffer);
+      
+      if (!saved) {
+        throw new Error(`Failed to save file: ${fileName}`);
+      }
+      
       writtenFiles.push(fileName);
 
       const certTitle = files.length > 1 ? `${title} (${i + 1})` : title;
@@ -238,10 +300,10 @@ export async function uploadCertificateAction(formData: FormData) {
       });
     }
   } catch (error) {
+    // Rollback: delete written files
     for (const fileName of writtenFiles) {
       try {
-        const filePath = path.join(certificatesDir, fileName);
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        await deleteCertificateFile(fileName);
       } catch {}
     }
     console.error('Error saving file:', error);
@@ -257,10 +319,10 @@ export async function uploadCertificateAction(formData: FormData) {
   const saved = await saveUsers(users);
 
   if (!saved) {
+    // Rollback: delete written files
     for (const fileName of writtenFiles) {
       try {
-        const filePath = path.join(certificatesDir, fileName);
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        await deleteCertificateFile(fileName);
       } catch {}
     }
     return { error: 'Gagal menyimpan data sertifikat' };
@@ -272,8 +334,11 @@ export async function uploadCertificateAction(formData: FormData) {
 }
 
 export async function deleteCertificateAction(formData: FormData) {
-  const userId = formData.get('userId') as string;
-  const certId = formData.get('certId') as string;
+  const { error: authError } = await requireAdmin();
+  if (authError) return { error: authError };
+
+  const userId = sanitizeInput(formData.get('userId') as string, 50);
+  const certId = sanitizeInput(formData.get('certId') as string, 50);
 
   if (!userId || !certId) {
     return { error: 'Data tidak valid' };
@@ -297,10 +362,7 @@ export async function deleteCertificateAction(formData: FormData) {
   users[userIndex].certificates.splice(certIndex, 1);
 
   try {
-    const filePath = path.join(process.cwd(), 'public', 'certificates', fileName);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    await deleteCertificateFile(fileName);
   } catch (error) {
     console.error('Error deleting file:', error);
   }
