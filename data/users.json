@@ -18,30 +18,6 @@
     "certificates": []
   },
   {
-    "id": "u1766290875335",
-    "name": "Rejal Mahardika",
-    "email": "rejal@gmail.com",
-    "password": "$2a$10$KnzU6ONzpeBF2WSw1UnzCezyRSWyYhYu/nLQUjupEZuEXsW7rS9jC",
-    "role": "user",
-    "status": "Selesai",
-    "certificates": [
-      {
-        "id": "cert1766290962122",
-        "title": "Certificate Magang (1)",
-        "file": "rejal-mahardika-1766290962118-31192c60-27f8-428d-98e2-7db95119a176.pdf",
-        "issuedAt": "2025-12-21",
-        "expiryDate": "2025-12-23"
-      },
-      {
-        "id": "cert1766290962130",
-        "title": "Certificate Magang (2)",
-        "file": "rejal-mahardika-1766290962118-fd348cc8-c79f-4eb3-98ed-ed14a572b5b7.pdf",
-        "issuedAt": "2025-12-21",
-        "expiryDate": "2025-12-23"
-      }
-    ]
-  },
-  {
     "id": "u1766325570861",
     "name": "test",
     "email": "test@gmail.com",
