@@ -66,5 +66,14 @@
     "role": "user",
     "status": "Selesai",
     "certificates": []
+  },
+  {
+    "id": "u1766370172408",
+    "name": "Feysha Vileytha Ervandy",
+    "email": "feysha@gmail.com",
+    "password": "$2a$10$msFWeTtuCrIxckKlTAtJZubi3CaH9J2HGrB4bl/1iYLLOHZhF60Vu",
+    "role": "user",
+    "status": "Aktif",
+    "certificates": []
   }
 ]
