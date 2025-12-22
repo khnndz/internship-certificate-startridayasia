@@ -1,28 +1,61 @@
 [
-    {
-        "id": "admin001",
-        "name": "Administrator",
-        "email": "admin@startfriday.asia",
-        "password": "$2b$10$mZ1xngpYiQqgBLAOciiV1eKcWiVSHNEEvVNUU/3c/YMRSBKgWchh2C",
-        "role": "admin",
-        "status": "Aktif",
-        "certificates": []
-    },
-    {
-        "id": "u1",
-        "name": "John Doe",
-        "email": "john@example.com",
-        "password": "$2b$10$gyvEFHGTj43LoOwvdVvksutNOBQLWHtiZ8vuUq9f5e.LIf6cR.T42",
-        "role": "user",
-        "status": "Aktif",
-        "certificates": [
-            {
-                "id": "cert1",
-                "title": "Certificate of Completion",
-                "file": "john-doe-12345-uuid.pdf",
-                "issuedAt": "2025-01-01",
-                "expiryDate": "2026-01-01"
-            }
-        ]
-    }
+  {
+    "id": "admin001",
+    "name": "Administrator",
+    "email": "admin@gmail.com",
+    "password": "$2a$10$N9qo8uLOickgx2ZMRZoMy.MqrqC8/XvH3RjPHEMVpTOqkZ.7IvlRe",
+    "role": "admin",
+    "status": "Aktif",
+    "certificates": []
+  },
+  {
+    "id": "admin002",
+    "name": "Super Admin",
+    "email": "superadmin@startfriday.asia",
+    "password": "$2a$10$t493HYl.NvxH.0KNa/uSe.sp3.w7mCY91ImWIBNRMyx/ptwHkCEAW",
+    "role": "admin",
+    "status": "Aktif",
+    "certificates": []
+  },
+  {
+    "id": "u1766289685449",
+    "name": "Ahmad Lazim",
+    "email": "lazimahmad431@gmail.com",
+    "password": "$2a$10$U7TRt0S/3ng1X900J1wYB.s.7VeZwCmq0vW2tT8evGBXFcfxj7tI.",
+    "role": "user",
+    "status": "Aktif",
+    "certificates": [
+      {
+        "id": "cert1766289721926",
+        "title": "Test 123",
+        "file": "ahmad-lazim-1766289721923-b3b63a9f-8fb8-45f1-a7b6-d6d94926263f.pdf",
+        "issuedAt": "2025-12-21",
+        "expiryDate": "2025-12-22"
+      }
+    ]
+  },
+  {
+    "id": "u1766290875335",
+    "name": "Rejal Mahardika",
+    "email": "rejal@gmail.com",
+    "password": "$2a$10$KnzU6ONzpeBF2WSw1UnzCezyRSWyYhYu/nLQUjupEZuEXsW7rS9jC",
+    "role": "user",
+    "status": "Selesai",
+    "certificates": [
+      {
+        "id": "cert1766290962122",
+        "title": "Certificate Magang (1)",
+        "file": "rejal-mahardika-1766290962118-31192c60-27f8-428d-98e2-7db95119a176.pdf",
+        "issuedAt": "2025-12-21",
+        "expiryDate": "2025-12-23"
+      },
+      {
+        "id": "cert1766290962130",
+        "title": "Certificate Magang (2)",
+        "file": "rejal-mahardika-1766290962118-fd348cc8-c79f-4eb3-98ed-ed14a572b5b7.pdf",
+        "issuedAt": "2025-12-21",
+        "expiryDate": "2025-12-23"
+      }
+    ]
+  }
 ]
