@@ -74,6 +74,13 @@
     "password": "$2a$10$msFWeTtuCrIxckKlTAtJZubi3CaH9J2HGrB4bl/1iYLLOHZhF60Vu",
     "role": "user",
     "status": "Selesai",
-    "certificates": []
+    "certificates": [
+      {
+        "id": "cert1766370353276",
+        "title": "Internship Certificate Feysha",
+        "file": "feysha-vileytha-ervandy-1766370352731-1c7cfa84-ebe9-41b7-84c9-971409814178.pdf",
+        "issuedAt": "2025-12-22"
+      }
+    ]
   }
 ]
