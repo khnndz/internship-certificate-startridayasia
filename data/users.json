@@ -57,5 +57,14 @@
         "expiryDate": "2025-12-23"
       }
     ]
+  },
+  {
+    "id": "u1766369524379",
+    "name": "imam",
+    "email": "imam@gmail.com",
+    "password": "$2a$10$e5kXDHiora2kY95CAL53juf1n7kPpV3MFzIEIa6KJ2ZkD17.65zLC",
+    "role": "user",
+    "status": "Selesai",
+    "certificates": []
   }
 ]
