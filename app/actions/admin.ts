@@ -3,7 +3,7 @@
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import { revalidatePath } from 'next/cache';
-import { getUsers, saveUsers, generateUserId, generateCertificateId } from '@/lib/data-kv';
+import { getUsers, generateUserId, generateCertificateId, addCertificate, deleteCertificate, getCertificateById, addUser, updateUser, deleteUser } from '@/lib/data-kv';
 import { User, Certificate } from '@/lib/types';
 import { getSession } from '@/lib/auth';
 import { saveCertificateFile, deleteCertificateFile } from '@/lib/file-storage';
@@ -68,8 +68,7 @@ export async function createUserAction(formData: FormData) {
     certificates: [],
   };
 
-  users.push(newUser);
-  const saved = await saveUsers(users);
+  const saved = await addUser(newUser);
 
   if (!saved) {
     return { error: 'Gagal menyimpan user' };
@@ -116,17 +115,18 @@ export async function updateUserAction(formData: FormData) {
     return { error: 'Email sudah digunakan user lain' };
   }
 
-  const nextPassword = password ? await bcrypt.hash(password, 10) : null;
-
-  users[userIndex] = {
-    ...users[userIndex],
+  const updates: Partial<User> = {
     name,
     email,
     status,
-    ...(nextPassword && { password: nextPassword }),
   };
 
-  const saved = await saveUsers(users);
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    updates.password = hashedPassword;
+  }
+
+  const saved = await updateUser(id, updates);
 
   if (!saved) {
     return { error: 'Gagal menyimpan perubahan' };
@@ -153,13 +153,13 @@ export async function deleteUserAction(formData: FormData) {
 
   const users = await getUsers();
   const userToDelete = users.find(u => u.id === id);
-  const filteredUsers = users.filter(u => u.id !== id);
 
-  if (filteredUsers.length === users.length) {
+  if (!userToDelete) {
     return { error: 'User tidak ditemukan' };
   }
 
-  const certificateFiles = (userToDelete?.certificates || [])
+  // Delete certificate files from storage
+  const certificateFiles = (userToDelete.certificates || [])
     .map(c => c.file)
     .filter((fileName): fileName is string => typeof fileName === 'string' && fileName.length > 0);
 
@@ -171,7 +171,8 @@ export async function deleteUserAction(formData: FormData) {
     }
   }
 
-  const saved = await saveUsers(filteredUsers);
+  // Delete user (will cascade delete certificates in database)
+  const saved = await deleteUser(id);
 
   if (!saved) {
     return { error: 'Gagal menghapus user' };
@@ -211,16 +212,17 @@ export async function updateAdminProfileAction(formData: FormData) {
     return { error: 'Email sudah digunakan user lain' };
   }
 
-  const nextPassword = password ? await bcrypt.hash(password, 10) : null;
-
-  users[userIndex] = {
-    ...users[userIndex],
+  const updates: Partial<User> = {
     name,
     email,
-    ...(nextPassword && { password: nextPassword }),
   };
 
-  const saved = await saveUsers(users);
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    updates.password = hashedPassword;
+  }
+
+  const saved = await updateUser(session.id, updates);
 
   if (!saved) {
     return { error: 'Gagal menyimpan perubahan profil' };
@@ -263,14 +265,14 @@ export async function uploadCertificateAction(formData: FormData) {
   }
 
   const users = await getUsers();
-  const userIndex = users.findIndex(u => u.id === userId);
+  const user = users.find(u => u.id === userId);
 
-  if (userIndex === -1) {
+  if (!user) {
     return { error: 'User tidak ditemukan' };
   }
 
   const timestamp = Date.now();
-  const sanitizedName = users[userIndex].name.toLowerCase().replace(/\s+/g, '-');
+  const sanitizedName = user.name.toLowerCase().replace(/\s+/g, '-');
 
   const issuedAt = new Date().toISOString().split('T')[0];
   const newCertificates: Certificate[] = [];
@@ -291,13 +293,21 @@ export async function uploadCertificateAction(formData: FormData) {
       writtenFiles.push(fileName);
 
       const certTitle = files.length > 1 ? `${title} (${i + 1})` : title;
-      newCertificates.push({
+      const certificate: Certificate = {
         id: generateCertificateId(),
         title: certTitle,
         file: fileName,
         issuedAt,
         ...(expiryDate && { expiryDate }),
-      });
+      };
+      
+      newCertificates.push(certificate);
+      
+      // Add certificate to database
+      const certSaved = await addCertificate(userId, certificate);
+      if (!certSaved) {
+        throw new Error(`Failed to save certificate metadata: ${fileName}`);
+      }
     }
   } catch (error) {
     // Rollback: delete written files
@@ -308,24 +318,6 @@ export async function uploadCertificateAction(formData: FormData) {
     }
     console.error('Error saving file:', error);
     return { error: 'Gagal menyimpan file' };
-  }
-
-  if (!users[userIndex].certificates) {
-    users[userIndex].certificates = [];
-  }
-
-  users[userIndex].certificates.push(...newCertificates);
-
-  const saved = await saveUsers(users);
-
-  if (!saved) {
-    // Rollback: delete written files
-    for (const fileName of writtenFiles) {
-      try {
-        await deleteCertificateFile(fileName);
-      } catch {}
-    }
-    return { error: 'Gagal menyimpan data sertifikat' };
   }
 
   revalidatePath('/admin/users');
@@ -344,33 +336,26 @@ export async function deleteCertificateAction(formData: FormData) {
     return { error: 'Data tidak valid' };
   }
 
-  const users = await getUsers();
-  const userIndex = users.findIndex(u => u.id === userId);
-
-  if (userIndex === -1) {
-    return { error: 'User tidak ditemukan' };
-  }
-
-  const certIndex = users[userIndex].certificates?.findIndex(c => c.id === certId);
+  const certificate = await getCertificateById(certId);
   
-  if (certIndex === undefined || certIndex === -1) {
+  if (!certificate) {
     return { error: 'Sertifikat tidak ditemukan' };
   }
 
-  const fileName = users[userIndex].certificates[certIndex].file;
+  const fileName = certificate.file;
 
-  users[userIndex].certificates.splice(certIndex, 1);
-
+  // Delete from storage
   try {
     await deleteCertificateFile(fileName);
   } catch (error) {
     console.error('Error deleting file:', error);
   }
 
-  const saved = await saveUsers(users);
+  // Delete from database
+  const saved = await deleteCertificate(certId);
 
   if (!saved) {
-    return { error: 'Gagal menyimpan perubahan' };
+    return { error: 'Gagal menghapus sertifikat' };
   }
 
   revalidatePath('/admin/users');

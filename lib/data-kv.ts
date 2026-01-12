@@ -1,194 +1,284 @@
-// Data module - Uses GitHub API for production, local file for development
-// This replaces Vercel KV with free unlimited GitHub storage
+// Data module - Uses Supabase for database storage
 
-import fs from 'fs';
-import path from 'path';
-import { User } from './types';
-import usersSeed from '@/data/users.json';
-
-const DATA_FILE = path.join(process.cwd(), 'data', 'users.json');
-const SEED_USERS = usersSeed as unknown as User[];
-
-// GitHub configuration
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GITHUB_OWNER = process.env.GITHUB_OWNER;
-const GITHUB_REPO = process.env.GITHUB_REPO;
-const GITHUB_FILE_PATH = 'data/users.json';
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
-
-const isProduction = process.env.VERCEL_ENV === 'production' || process.env.VERCEL_ENV === 'preview';
-const useGitHub = isProduction && GITHUB_TOKEN && GITHUB_OWNER && GITHUB_REPO;
-
-interface GitHubFileResponse {
-  content: string;
-  sha: string;
-  encoding: string;
-}
-
-// Cache untuk mengurangi API calls
-let cachedUsers: User[] | null = null;
-let cachedSha: string | null = null;
-let cacheTimestamp: number = 0;
-const CACHE_DURATION = 30000; // 30 detik cache
-
-async function getFileFromGitHub(): Promise<{ users: User[]; sha: string }> {
-  // Check cache
-  if (cachedUsers && cachedSha && (Date.now() - cacheTimestamp < CACHE_DURATION)) {
-    return { users: cachedUsers, sha: cachedSha };
-  }
-
-  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}?ref=${GITHUB_BRANCH}`;
-  
-  const response = await fetch(url, {
-    headers: {
-      'Authorization': `Bearer ${GITHUB_TOKEN}`,
-      'Accept': 'application/vnd.github.v3+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-    },
-    cache: 'no-store',
-  });
-
-  if (!response.ok) {
-    console.error('GitHub API Error:', response.status, await response.text());
-    return { users: SEED_USERS, sha: '' };
-  }
-
-  const data: GitHubFileResponse = await response.json();
-  const content = Buffer.from(data.content, 'base64').toString('utf-8');
-  const users = JSON.parse(content) as User[];
-
-  // Update cache
-  cachedUsers = users;
-  cachedSha = data.sha;
-  cacheTimestamp = Date.now();
-
-  return { users, sha: data.sha };
-}
-
-async function saveFileToGitHub(users: User[], sha: string): Promise<boolean> {
-  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
-  
-  const content = Buffer.from(JSON.stringify(users, null, 2)).toString('base64');
-  
-  const response = await fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${GITHUB_TOKEN}`,
-      'Accept': 'application/vnd.github.v3+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      message: `Update users data - ${new Date().toISOString()}`,
-      content: content,
-      sha: sha,
-      branch: GITHUB_BRANCH,
-    }),
-  });
-
-  if (!response.ok) {
-    console.error('GitHub API Save Error:', response.status, await response.text());
-    return false;
-  }
-
-  // Update cache
-  const result = await response.json();
-  cachedUsers = users;
-  cachedSha = result.content.sha;
-  cacheTimestamp = Date.now();
-
-  return true;
-}
+import { supabase, dbUserToLegacy, dbCertificateToLegacy, DbUser, DbCertificate } from './supabase';
+import { User, Certificate } from './types';
 
 export async function getUsers(): Promise<User[]> {
-  if (useGitHub) {
-    try {
-      const { users } = await getFileFromGitHub();
-      return users;
-    } catch (error) {
-      console.error('Error reading users from GitHub:', error);
-      return SEED_USERS;
-    }
-  }
-
-  // Local development - use file system
   try {
-    const data = fs.readFileSync(DATA_FILE, 'utf-8');
-    const parsed = JSON.parse(data);
-    return Array.isArray(parsed) ? (parsed as User[]) : SEED_USERS;
+    const { data: dbUsers, error } = await supabase
+      .from('users')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching users from Supabase:', error);
+      return [];
+    }
+
+    if (!dbUsers) return [];
+
+    // Get certificates for all users
+    const userIds = dbUsers.map(u => u.id);
+    const { data: dbCertificates } = await supabase
+      .from('certificates')
+      .select('*')
+      .in('user_id', userIds);
+
+    // Convert to legacy format
+    const users: User[] = dbUsers.map((dbUser: DbUser) => {
+      const userCerts = (dbCertificates || [])
+        .filter((c: DbCertificate) => c.user_id === dbUser.id)
+        .map(dbCertificateToLegacy);
+      return dbUserToLegacy(dbUser, userCerts);
+    });
+
+    return users;
   } catch (error) {
-    console.error('Error reading users from file:', error);
-    return SEED_USERS;
+    console.error('Error in getUsers:', error);
+    return [];
   }
 }
 
 export async function getUserById(id: string): Promise<User | undefined> {
-  const users = await getUsers();
-  return users.find(user => user.id === id);
+  try {
+    const { data: dbUser, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !dbUser) {
+      return undefined;
+    }
+
+    // Get user's certificates
+    const { data: dbCertificates } = await supabase
+      .from('certificates')
+      .select('*')
+      .eq('user_id', id);
+
+    const certificates = (dbCertificates || []).map(dbCertificateToLegacy);
+    return dbUserToLegacy(dbUser, certificates);
+  } catch (error) {
+    console.error('Error in getUserById:', error);
+    return undefined;
+  }
 }
 
 export async function getUserByEmail(email: string): Promise<User | undefined> {
-  const users = await getUsers();
-  return users.find(user => user.email.toLowerCase() === email.toLowerCase());
+  try {
+    const { data: dbUser, error } = await supabase
+      .from('users')
+      .select('*')
+      .ilike('email', email)
+      .single();
+
+    if (error || !dbUser) {
+      return undefined;
+    }
+
+    // Get user's certificates
+    const { data: dbCertificates } = await supabase
+      .from('certificates')
+      .select('*')
+      .eq('user_id', dbUser.id);
+
+    const certificates = (dbCertificates || []).map(dbCertificateToLegacy);
+    return dbUserToLegacy(dbUser, certificates);
+  } catch (error) {
+    console.error('Error in getUserByEmail:', error);
+    return undefined;
+  }
 }
 
 export async function saveUsers(users: User[]): Promise<boolean> {
-  if (useGitHub) {
-    try {
-      const { sha } = await getFileFromGitHub();
-      return await saveFileToGitHub(users, sha);
-    } catch (error) {
-      console.error('Error saving users to GitHub:', error);
+  // This function is deprecated in Supabase version
+  // Use addUser, updateUser, deleteUser instead
+  console.warn('saveUsers is deprecated - use specific CRUD functions');
+  return false;
+}
+
+export async function addUser(user: User): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('users')
+      .insert({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        password_hash: user.password,
+        role: user.role,
+        status: user.status,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+    if (error) {
+      console.error('Error adding user to Supabase:', error);
       return false;
     }
-  }
 
-  // Local development - use file system
-  try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(users, null, 2), 'utf-8');
     return true;
   } catch (error) {
-    console.error('Error saving users to file:', error);
+    console.error('Error in addUser:', error);
     return false;
   }
 }
 
-export async function addUser(user: User): Promise<boolean> {
-  const users = await getUsers();
-  users.push(user);
-  return saveUsers(users);
-}
-
 export async function updateUser(id: string, updates: Partial<User>): Promise<boolean> {
-  const users = await getUsers();
-  const index = users.findIndex(user => user.id === id);
-  
-  if (index === -1) return false;
-  
-  users[index] = { ...users[index], ...updates };
-  return saveUsers(users);
+  try {
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (updates.name) updateData.name = updates.name;
+    if (updates.email) updateData.email = updates.email;
+    if (updates.password) updateData.password_hash = updates.password;
+    if (updates.status) updateData.status = updates.status;
+    if (updates.role) updateData.role = updates.role;
+
+    const { error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating user in Supabase:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error in updateUser:', error);
+    return false;
+  }
 }
 
 export async function deleteUser(id: string): Promise<boolean> {
-  const users = await getUsers();
-  const filteredUsers = users.filter(user => user.id !== id);
-  
-  if (filteredUsers.length === users.length) return false;
-  
-  return saveUsers(filteredUsers);
+  try {
+    // Delete user (certificates will be cascade deleted by database FK constraint)
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting user from Supabase:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error in deleteUser:', error);
+    return false;
+  }
 }
 
 export function generateUserId(): string {
-  return `u${Date.now()}`;
+  // Use crypto.randomUUID() for better unique IDs compatible with Supabase UUID
+  // Requires Node.js 18.4.0+
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older Node.js versions
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 export function generateCertificateId(): string {
-  return `cert${Date.now()}`;
+  // Use crypto.randomUUID() for better unique IDs compatible with Supabase UUID
+  // Requires Node.js 18.4.0+
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older Node.js versions
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
-// Invalidate cache (call after external changes)
-export function invalidateCache(): void {
-  cachedUsers = null;
-  cachedSha = null;
-  cacheTimestamp = 0;
+// Helper to add certificate to user
+export async function addCertificate(userId: string, certificate: Certificate): Promise<boolean> {
+  try {
+    // Parse title to extract intern name and position
+    // Expected format: "Position - Name" or just "Position"
+    let intern_name = certificate.title;
+    let position = certificate.title;
+    
+    if (certificate.title.includes(' - ')) {
+      const parts = certificate.title.split(' - ');
+      position = parts[0].trim();
+      intern_name = parts.slice(1).join(' - ').trim() || position;
+    }
+    
+    const { error } = await supabase
+      .from('certificates')
+      .insert({
+        id: certificate.id,
+        user_id: userId,
+        cert_number: certificate.id, // Use cert ID as cert number
+        intern_name: intern_name,
+        position: position,
+        start_date: certificate.issuedAt,
+        end_date: certificate.expiryDate || certificate.issuedAt,
+        pdf_url: certificate.file,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+    if (error) {
+      console.error('Error adding certificate to Supabase:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error in addCertificate:', error);
+    return false;
+  }
+}
+
+// Helper to delete certificate
+export async function deleteCertificate(certId: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('certificates')
+      .delete()
+      .eq('id', certId);
+
+    if (error) {
+      console.error('Error deleting certificate from Supabase:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error in deleteCertificate:', error);
+    return false;
+  }
+}
+
+// Helper to get certificate by ID
+export async function getCertificateById(certId: string): Promise<Certificate | undefined> {
+  try {
+    const { data: dbCert, error } = await supabase
+      .from('certificates')
+      .select('*')
+      .eq('id', certId)
+      .single();
+
+    if (error || !dbCert) {
+      return undefined;
+    }
+
+    return dbCertificateToLegacy(dbCert);
+  } catch (error) {
+    console.error('Error in getCertificateById:', error);
+    return undefined;
+  }
 }
