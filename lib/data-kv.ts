@@ -176,25 +176,54 @@ export async function deleteUser(id: string): Promise<boolean> {
 
 export function generateUserId(): string {
   // Use crypto.randomUUID() for better unique IDs compatible with Supabase UUID
-  return crypto.randomUUID();
+  // Requires Node.js 18.4.0+
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older Node.js versions
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 export function generateCertificateId(): string {
   // Use crypto.randomUUID() for better unique IDs compatible with Supabase UUID
-  return crypto.randomUUID();
+  // Requires Node.js 18.4.0+
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older Node.js versions
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 // Helper to add certificate to user
 export async function addCertificate(userId: string, certificate: Certificate): Promise<boolean> {
   try {
+    // Parse title to extract intern name and position
+    // Expected format: "Position - Name" or just "Position"
+    let intern_name = certificate.title;
+    let position = certificate.title;
+    
+    if (certificate.title.includes(' - ')) {
+      const parts = certificate.title.split(' - ');
+      position = parts[0].trim();
+      intern_name = parts.slice(1).join(' - ').trim() || position;
+    }
+    
     const { error } = await supabase
       .from('certificates')
       .insert({
         id: certificate.id,
         user_id: userId,
         cert_number: certificate.id, // Use cert ID as cert number
-        intern_name: certificate.title.split(' - ')[0] || certificate.title,
-        position: certificate.title,
+        intern_name: intern_name,
+        position: position,
         start_date: certificate.issuedAt,
         end_date: certificate.expiryDate || certificate.issuedAt,
         pdf_url: certificate.file,

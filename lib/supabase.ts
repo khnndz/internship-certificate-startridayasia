@@ -51,10 +51,16 @@ export interface User {
 
 // Helper to convert DB certificate to legacy format
 export function dbCertificateToLegacy(dbCert: DbCertificate): Certificate {
+  // Extract filename from pdf_url (could be just filename or full path)
+  let fileName = dbCert.pdf_url;
+  if (fileName.includes('/')) {
+    fileName = fileName.split('/').pop() || fileName;
+  }
+  
   return {
     id: dbCert.id,
     title: `${dbCert.position} - ${dbCert.intern_name}`,
-    file: dbCert.pdf_url.split('/').pop() || '',
+    file: fileName,
     issuedAt: dbCert.start_date,
     expiryDate: dbCert.end_date,
   }
