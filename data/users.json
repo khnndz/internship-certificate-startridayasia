@@ -66,5 +66,21 @@
     "role": "user",
     "status": "Selesai",
     "certificates": []
+  },
+  {
+    "id": "u1766375159453",
+    "name": "Feysha Vileytha Ervandy",
+    "email": "feysha@gmail.com",
+    "password": "$2a$10$5rgrvJRGfJiv5y073MqnX.9t5zVa0qjpiHJHujsTz6IqhNcj8GxtK",
+    "role": "user",
+    "status": "Selesai",
+    "certificates": [
+      {
+        "id": "cert1766375200394",
+        "title": "Internship Certifiate Feysha",
+        "file": "feysha-vileytha-ervandy-1766375200385-72f63f6c-a3cc-4ae6-9ab2-5a4083f5556c.pdf",
+        "issuedAt": "2025-12-22"
+      }
+    ]
   }
 ]

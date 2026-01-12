@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
 import { getUserById } from '@/lib/data-kv';
 import { Navbar } from '@/components/Navbar';
-import { UserSidebar } from '@/components/UserSidebar';
 
 export default async function DashboardLayout({
   children,
@@ -26,7 +25,6 @@ export default async function DashboardLayout({
       <Navbar user={user} />
       <main className="px-4 sm:px-6 lg:px-10 py-8">
         <div className="flex gap-6">
-          <UserSidebar />
           <div className="flex-1">
             {children}
           </div>
