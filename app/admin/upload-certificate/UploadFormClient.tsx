@@ -290,10 +290,12 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                                 )}
                               </div>
                               <a
-                                href={`/certificates/${cert.file}`}
-                                target="_blank"
-                                className="text-xs font-medium text-primary-600 hover:text-primary-700"
-                              >
+  href={`/api/download/${cert.file}`}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Lihat
+</a>
                                 Lihat
                               </a>
                             </div>

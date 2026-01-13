@@ -55,7 +55,7 @@ export default async function CertificatePreviewPage() {
 
             {/* Action */}
             <div className="flex justify-center">
-              <a href={`/certificates/${certificates[0].file}`} download>
+              <a href={`/api/download/${certificates[0].file}`} download>
                 <Button
                   variant="primary"
                   className="
