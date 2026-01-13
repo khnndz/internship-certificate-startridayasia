@@ -1,5 +1,6 @@
 'use client';
 
+import { formatPeriode } from '@/lib/supabase';
 import { useState, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@/lib/types';
@@ -261,9 +262,15 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        <Badge variant={user.status === 'Aktif' ? 'success' : 'secondary'}>
-                          {user.status}
-                        </Badge>
+                       <div className="flex items-center gap-2"></div>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          <span>💼</span>
+                          <span>{user.posisi || '-'}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <span>📅</span>
+                          <span>{formatPeriode(user.periode_start, user.periode_end)}</span>
+                        </span>
                         <span className="text-sm text-gray-600 font-medium">{certCount}</span>
                       </div>
                     </summary>

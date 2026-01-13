@@ -22,18 +22,20 @@ export async function GET(request: NextRequest) {
     
     // Create backup data with metadata
     const backupData = {
-      version: '1.0',
+      version: '2.0',  // ✅ CHANGED version
       exportedAt: new Date().toISOString(),
       exportedBy: session.email,
-      totalUsers: users.length,
+      totalUsers: users. length,
       totalCertificates: users.reduce((acc, u) => acc + (u.certificates?.length || 0), 0),
       users: users.map(user => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
+        id: user. id,
+        name: user. name,
+        email: user. email,
         password: user.password, // Hashed password
         role: user.role,
-        status: user.status,
+        posisi: user.posisi,              // ✅ CHANGED
+        periode_start: user.periode_start,  // ✅ ADDED
+        periode_end: user. periode_end,      // ✅ ADDED
         certificates: user.certificates || [],
       })),
     };
@@ -51,7 +53,7 @@ export async function GET(request: NextRequest) {
     console.error('Backup error:', error);
     return NextResponse.json(
       { error: 'Failed to create backup' },
-      { status: 500 }
+      { status:  500 }
     );
   }
 }

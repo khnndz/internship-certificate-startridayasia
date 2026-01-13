@@ -19,7 +19,9 @@ export async function GET() {
     name: user.name,
     email: user.email,
     role: user.role,
-    status: user.status,
+    posisi: user.posisi,              // ✅ CHANGED
+    periode_start: user.periode_start,  // ✅ ADDED
+    periode_end: user. periode_end,      // ✅ ADDED
     certificates: user.certificates,
   }));
 

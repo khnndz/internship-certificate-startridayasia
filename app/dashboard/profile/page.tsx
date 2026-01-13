@@ -1,20 +1,27 @@
 import { getSession } from '@/lib/auth';
-import { getUserById } from '@/lib/data-kv';
+import { getUserByEmail } from '@/lib/data-kv';
+import { redirect } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
+import { formatPeriode } from '@/lib/supabase';
 
-export default async function ProfilePage() {
+export default async function UserProfilePage() {
   const session = await getSession();
-  const user = session ? await getUserById(session.id) : null;
+
+  if (!session || session.role !== 'user') {
+    redirect('/login');
+  }
+
+  const user = await getUserByEmail(session.email);
 
   if (!user) {
-    return <div>Loading...</div>;
+    redirect('/login');
   }
 
   return (
-    <div className="bg-white w-full min-h-screen">
-      <div className="max-w-5xl mx-auto px-6 sm:px-10 py-20 space-y-12">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto space-y-8">
 
         {/* Page Header */}
         <section className="text-center max-w-3xl mx-auto space-y-3">
@@ -51,11 +58,12 @@ export default async function ProfilePage() {
                 <Badge variant="primary" className="capitalize">
                   {user.role}
                 </Badge>
-                <Badge
-                  variant={user.status === 'Aktif' ? 'success' : 'neutral'}
-                >
-                  {user.status}
-                </Badge>
+                {/* ✅ CHANGED - Show Posisi instead of Status */}
+                {user.posisi && (
+                  <Badge variant="secondary">
+                    💼 {user.posisi}
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -79,10 +87,19 @@ export default async function ProfilePage() {
               </div>
             </div>
 
+            {/* ✅ CHANGED - Show Posisi */}
             <div>
-              <p className="text-slate-500 mb-1">Account Status</p>
+              <p className="text-slate-500 mb-1">Position</p>
               <div className="px-4 py-3 bg-slate-50 rounded-lg text-[#0A0909]">
-                {user.status}
+                {user.posisi || '-'}
+              </div>
+            </div>
+
+            {/* ✅ CHANGED - Show Periode */}
+            <div>
+              <p className="text-slate-500 mb-1">Internship Period</p>
+              <div className="px-4 py-3 bg-slate-50 rounded-lg text-[#0A0909]">
+                {formatPeriode(user.periode_start, user.periode_end)}
               </div>
             </div>
 
