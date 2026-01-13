@@ -4,23 +4,21 @@ import { createClient } from '@supabase/supabase-js'
 // DUAL CLIENT PATTERN
 // ===================================
 
-// Public client (anon key) - Read-only via RLS
 export function getSupabaseClient() {
-  const supabaseUrl = process.env. NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env. NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  if (!supabaseUrl || ! supabaseKey) {
+  if (!supabaseUrl || !supabaseKey) {
     console.error('❌ Supabase public env vars not set!')
-    throw new Error('Supabase public configuration missing.  Check .env.local file.')
+    throw new Error('Supabase public configuration missing.  Check . env.local file.')
   }
 
   return createClient(supabaseUrl, supabaseKey)
 }
 
-// Admin client (service_role key) - Full access
 export function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const serviceRoleKey = process.env. SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !serviceRoleKey) {
     console.error('❌ Supabase admin env vars not set!')
@@ -29,14 +27,13 @@ export function getSupabaseAdmin() {
   }
 
   return createClient(supabaseUrl, serviceRoleKey, {
-    auth:  {
-      autoRefreshToken:  false,
+    auth: {
+      autoRefreshToken: false,
       persistSession: false
     }
   })
 }
 
-// Export default public client for convenience
 export const supabase = getSupabaseClient()
 
 // ===================================
@@ -46,10 +43,12 @@ export const supabase = getSupabaseClient()
 export type DbUser = {
   id: string
   email: string
-  name: string
+  name:  string
   password_hash: string
-  role: 'admin' | 'user'
-  status: string
+  role:  'admin' | 'user'
+  posisi: string           // ✅ NEW
+  periode_start: string    // ✅ NEW
+  periode_end: string      // ✅ NEW
   created_at: string
   updated_at: string
 }
@@ -58,17 +57,17 @@ export type DbCertificate = {
   id: string
   user_id: string
   cert_number: string
-  intern_name:  string
+  intern_name: string
   position: string
-  start_date: string
+  start_date:  string
   end_date: string
   pdf_url: string
   created_at: string
-  updated_at:  string
+  updated_at: string
 }
 
 // ===================================
-// LEGACY TYPES (for compatibility)
+// LEGACY TYPES
 // ===================================
 
 export interface Certificate {
@@ -76,7 +75,7 @@ export interface Certificate {
   title: string;
   file: string;
   issuedAt: string;
-  expiryDate?:  string;
+  expiryDate?: string;
 }
 
 export interface User {
@@ -85,7 +84,9 @@ export interface User {
   email: string;
   password: string;
   role: 'user' | 'admin';
-  status: string;
+  posisi: string;          // ✅ NEW
+  periode_start: string;   // ✅ NEW
+  periode_end: string;     // ✅ NEW
   certificates: Certificate[];
 }
 
@@ -93,12 +94,10 @@ export interface User {
 // CONVERSION HELPERS
 // ===================================
 
-// Helper to convert DB certificate to legacy format
 export function dbCertificateToLegacy(dbCert: DbCertificate): Certificate {
-  // Extract filename from pdf_url (could be just filename or full path)
   let fileName = dbCert.pdf_url;
   if (fileName.includes('/')) {
-    fileName = fileName.split('/').pop() || fileName;
+    fileName = fileName. split('/').pop() || fileName;
   }
   
   return {
@@ -106,11 +105,10 @@ export function dbCertificateToLegacy(dbCert: DbCertificate): Certificate {
     title: `${dbCert.position} - ${dbCert.intern_name}`,
     file: fileName,
     issuedAt: dbCert.start_date,
-    expiryDate:  dbCert.end_date,
+    expiryDate: dbCert.end_date,
   }
 }
 
-// Helper to convert DB user to legacy format
 export function dbUserToLegacy(dbUser: DbUser, certificates: Certificate[] = []): User {
   return {
     id: dbUser. id,
@@ -118,7 +116,29 @@ export function dbUserToLegacy(dbUser: DbUser, certificates: Certificate[] = [])
     email: dbUser.email,
     password: dbUser.password_hash,
     role: dbUser.role,
-    status: dbUser.status,
+    posisi: dbUser.posisi || '',           // ✅ NEW
+    periode_start: dbUser.periode_start || '',  // ✅ NEW
+    periode_end: dbUser.periode_end || '',      // ✅ NEW
     certificates,
+  }
+}
+
+// ===================================
+// HELPER:  Format Periode Display
+// ===================================
+
+export function formatPeriode(start: string, end: string): string {
+  if (!start || !end) return '-';
+  
+  try {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    
+    const startMonth = startDate.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+    const endMonth = endDate. toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+    
+    return `${startMonth} - ${endMonth}`;
+  } catch {
+    return '-';
   }
 }

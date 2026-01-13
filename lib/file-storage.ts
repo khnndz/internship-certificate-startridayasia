@@ -1,14 +1,20 @@
-import { supabase } from './supabase';
+import { getSupabaseClient, getSupabaseAdmin } from './supabase';
 
 const BUCKET_NAME = 'certificates';
 
-// ============ PUBLIC API ============
+// ===================================
+// FILE OPERATIONS (use admin client for write)
+// ===================================
 
 /**
  * Simpan file certificate ke Supabase Storage
  */
 export async function saveCertificateFile(fileName: string, content: Buffer): Promise<boolean> {
   try {
+    const supabase = getSupabaseAdmin(); // ✅ Use admin client for upload
+    
+    console.log('📤 [STORAGE] Uploading file:', fileName);
+    
     const { error } = await supabase.storage
       .from(BUCKET_NAME)
       .upload(fileName, content, {
@@ -17,13 +23,14 @@ export async function saveCertificateFile(fileName: string, content: Buffer): Pr
       });
 
     if (error) {
-      console.error('Error uploading to Supabase Storage:', error);
+      console.error('❌ [STORAGE] Error uploading to Supabase Storage:', error);
       return false;
     }
 
+    console.log('✅ [STORAGE] File uploaded successfully');
     return true;
   } catch (error) {
-    console.error('Error in saveCertificateFile:', error);
+    console.error('❌ [STORAGE] Exception in saveCertificateFile:', error);
     return false;
   }
 }
@@ -33,22 +40,30 @@ export async function saveCertificateFile(fileName: string, content: Buffer): Pr
  */
 export async function getCertificateFile(fileName: string): Promise<Buffer | null> {
   try {
+    const supabase = getSupabaseClient(); // Public client for read
+    
+    console.log('📥 [STORAGE] Downloading file:', fileName);
+    
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME)
       .download(fileName);
 
     if (error) {
-      console.error('Error downloading from Supabase Storage:', error);
+      console.error('❌ [STORAGE] Error downloading from Supabase Storage:', error);
       return null;
     }
 
-    if (!data) return null;
+    if (!data) {
+      console.log('❌ [STORAGE] File not found');
+      return null;
+    }
 
     // Convert Blob to Buffer
     const arrayBuffer = await data.arrayBuffer();
+    console.log('✅ [STORAGE] File downloaded successfully');
     return Buffer.from(arrayBuffer);
   } catch (error) {
-    console.error('Error in getCertificateFile:', error);
+    console.error('❌ [STORAGE] Exception in getCertificateFile:', error);
     return null;
   }
 }
@@ -58,18 +73,23 @@ export async function getCertificateFile(fileName: string): Promise<Buffer | nul
  */
 export async function deleteCertificateFile(fileName: string): Promise<boolean> {
   try {
+    const supabase = getSupabaseAdmin(); // ✅ Use admin client for delete
+    
+    console.log('🗑️ [STORAGE] Deleting file:', fileName);
+    
     const { error } = await supabase.storage
       .from(BUCKET_NAME)
       .remove([fileName]);
 
     if (error) {
-      console.error('Error deleting from Supabase Storage:', error);
+      console.error('❌ [STORAGE] Error deleting from Supabase Storage:', error);
       return false;
     }
 
+    console.log('✅ [STORAGE] File deleted successfully');
     return true;
   } catch (error) {
-    console.error('Error in deleteCertificateFile:', error);
+    console.error('❌ [STORAGE] Exception in deleteCertificateFile:', error);
     return false;
   }
 }
@@ -79,6 +99,8 @@ export async function deleteCertificateFile(fileName: string): Promise<boolean> 
  */
 export async function certificateFileExists(fileName: string): Promise<boolean> {
   try {
+    const supabase = getSupabaseClient(); // Public client for list
+    
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME)
       .list('', {
@@ -86,12 +108,13 @@ export async function certificateFileExists(fileName: string): Promise<boolean> 
       });
 
     if (error) {
+      console.error('❌ [STORAGE] Error checking file exists:', error);
       return false;
     }
 
-    return data ? data.some(file => file.name === fileName) : false;
+    return data ?  data.some(file => file. name === fileName) : false;
   } catch (error) {
-    console.error('Error in certificateFileExists:', error);
+    console.error('❌ [STORAGE] Exception in certificateFileExists:', error);
     return false;
   }
 }
@@ -108,6 +131,8 @@ export function getCertificateDownloadUrl(fileName: string): string {
  * Get public URL dari Supabase Storage
  */
 export function getCertificatePublicUrl(fileName: string): string {
+  const supabase = getSupabaseClient();
+  
   const { data } = supabase.storage
     .from(BUCKET_NAME)
     .getPublicUrl(fileName);
@@ -120,18 +145,20 @@ export function getCertificatePublicUrl(fileName: string): string {
  */
 export async function getCertificateSignedUrl(fileName: string): Promise<string | null> {
   try {
+    const supabase = getSupabaseClient(); // Public client can create signed URLs
+    
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME)
       .createSignedUrl(fileName, 3600); // 1 hour expiry
 
     if (error) {
-      console.error('Error creating signed URL:', error);
+      console.error('❌ [STORAGE] Error creating signed URL:', error);
       return null;
     }
 
     return data.signedUrl;
   } catch (error) {
-    console.error('Error in getCertificateSignedUrl:', error);
+    console.error('❌ [STORAGE] Exception in getCertificateSignedUrl:', error);
     return null;
   }
 }

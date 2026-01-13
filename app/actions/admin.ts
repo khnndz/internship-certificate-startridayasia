@@ -8,51 +8,87 @@ import { User, Certificate } from '@/lib/types';
 import { getSession } from '@/lib/auth';
 import { saveCertificateFile, deleteCertificateFile } from '@/lib/file-storage';
 
-// Helper: Sanitize string input
+// ===================================
+// HELPER FUNCTIONS
+// ===================================
+
+// Helper:  Sanitize string input
 function sanitizeInput(input: string | null, maxLength: number = 255): string {
   if (!input) return '';
   return input.trim().slice(0, maxLength);
 }
 
-// Helper: Validate email format
+// Helper:  Validate email format
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email) && email.length <= 255;
 }
 
+// Helper:  Validate date format (YYYY-MM-DD)
+function isValidDate(dateString: string): boolean {
+  if (!dateString) return false;
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateString)) return false;
+  const date = new Date(dateString);
+  return date instanceof Date && !isNaN(date.getTime());
+}
+
 // Helper: Check admin session
-async function requireAdmin(): Promise<{ error?: string; session?: any }> {
+async function requireAdmin(): Promise<{ error?:  string; session?: any }> {
   const session = await getSession();
   if (!session || session.role !== 'admin') {
-    return { error: 'Unauthorized: Admin access required' };
+    return { error: 'Unauthorized:  Admin access required' };
   }
   return { session };
 }
 
-export async function createUserAction(formData: FormData) {
-  const { error: authError } = await requireAdmin();
+// ===================================
+// USER MANAGEMENT ACTIONS
+// ===================================
+
+export async function createUserAction(formData:  FormData) {
+  const { error:  authError } = await requireAdmin();
   if (authError) return { error: authError };
 
   const name = sanitizeInput(formData.get('name') as string, 100);
   const email = sanitizeInput(formData.get('email') as string, 255).toLowerCase();
   const password = formData.get('password') as string;
-  const status = sanitizeInput(formData.get('status') as string, 50) || 'Aktif';
+  const posisi = sanitizeInput(formData.get('posisi') as string, 100);
+  const periode_start = sanitizeInput(formData.get('periode_start') as string, 20);
+  const periode_end = sanitizeInput(formData.get('periode_end') as string, 20);
 
+  // Validation
   if (!name || !email || !password) {
-    return { error: 'Semua field harus diisi' };
+    return { error: 'Nama, email, dan password harus diisi' };
   }
 
   if (!isValidEmail(email)) {
-    return { error: 'Format email tidak valid' };
+    return { error:  'Format email tidak valid' };
   }
 
   if (password.length < 6 || password.length > 128) {
-    return { error: 'Password harus 6-128 karakter' };
+    return { error:  'Password harus 6-128 karakter' };
+  }
+
+  if (!posisi) {
+    return { error: 'Posisi/divisi harus diisi' };
+  }
+
+  if (!periode_start || !periode_end) {
+    return { error: 'Periode magang harus diisi (tanggal mulai dan selesai)' };
+  }
+
+  if (!isValidDate(periode_start) || !isValidDate(periode_end)) {
+    return { error: 'Format tanggal tidak valid' };
+  }
+
+  if (new Date(periode_start) > new Date(periode_end)) {
+    return { error: 'Tanggal mulai harus sebelum tanggal selesai' };
   }
 
   const users = await getUsers();
   
-  if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+  if (users.some(u => u.email. toLowerCase() === email.toLowerCase())) {
     return { error: 'Email sudah terdaftar' };
   }
 
@@ -64,13 +100,15 @@ export async function createUserAction(formData: FormData) {
     email,
     password: hashedPassword,
     role: 'user',
-    status,
+    posisi,
+    periode_start,
+    periode_end,
     certificates: [],
   };
 
   const saved = await addUser(newUser);
 
-  if (!saved) {
+  if (! saved) {
     return { error: 'Gagal menyimpan user' };
   }
 
@@ -86,25 +124,39 @@ export async function updateUserAction(formData: FormData) {
   const name = sanitizeInput(formData.get('name') as string, 100);
   const email = sanitizeInput(formData.get('email') as string, 255).toLowerCase();
   const password = formData.get('password') as string;
-  const status = sanitizeInput(formData.get('status') as string, 50);
+  const posisi = sanitizeInput(formData. get('posisi') as string, 100);
+  const periode_start = sanitizeInput(formData.get('periode_start') as string, 20);
+  const periode_end = sanitizeInput(formData.get('periode_end') as string, 20);
 
   if (!id || !name || !email) {
     return { error: 'Data tidak lengkap' };
   }
 
   if (!isValidEmail(email)) {
-    return { error: 'Format email tidak valid' };
+    return { error:  'Format email tidak valid' };
   }
 
   if (password && (password.length < 6 || password.length > 128)) {
     return { error: 'Password harus 6-128 karakter' };
   }
 
+  if (periode_start && ! isValidDate(periode_start)) {
+    return { error: 'Format tanggal mulai tidak valid' };
+  }
+
+  if (periode_end && !isValidDate(periode_end)) {
+    return { error:  'Format tanggal selesai tidak valid' };
+  }
+
+  if (periode_start && periode_end && new Date(periode_start) > new Date(periode_end)) {
+    return { error: 'Tanggal mulai harus sebelum tanggal selesai' };
+  }
+
   const users = await getUsers();
   const userIndex = users.findIndex(u => u.id === id);
 
   if (userIndex === -1) {
-    return { error: 'User tidak ditemukan' };
+    return { error:  'User tidak ditemukan' };
   }
 
   const emailExists = users.some(
@@ -115,14 +167,17 @@ export async function updateUserAction(formData: FormData) {
     return { error: 'Email sudah digunakan user lain' };
   }
 
-  const updates: Partial<User> = {
+  const updates:  Partial<User> = {
     name,
     email,
-    status,
   };
 
+  if (posisi) updates.posisi = posisi;
+  if (periode_start) updates.periode_start = periode_start;
+  if (periode_end) updates.periode_end = periode_end;
+
   if (password) {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt. hash(password, 10);
     updates.password = hashedPassword;
   }
 
@@ -133,17 +188,17 @@ export async function updateUserAction(formData: FormData) {
   }
 
   revalidatePath('/admin/users');
-  return { success: true, message: 'User berhasil diupdate' };
+  return { success: true, message:  'User berhasil diupdate' };
 }
 
-export async function deleteUserAction(formData: FormData) {
+export async function deleteUserAction(formData:  FormData) {
   const { error: authError, session } = await requireAdmin();
   if (authError) return { error: authError };
 
   const id = sanitizeInput(formData.get('id') as string, 50);
 
   if (!id) {
-    return { error: 'ID user tidak valid' };
+    return { error:  'ID user tidak valid' };
   }
 
   // Prevent admin from deleting themselves
@@ -179,8 +234,12 @@ export async function deleteUserAction(formData: FormData) {
   }
 
   revalidatePath('/admin/users');
-  return { success: true, message: 'User berhasil dihapus' };
+  return { success: true, message:  'User berhasil dihapus' };
 }
+
+// ===================================
+// ADMIN PROFILE ACTIONS
+// ===================================
 
 export async function updateAdminProfileAction(formData: FormData) {
   const session = await getSession();
@@ -233,12 +292,16 @@ export async function updateAdminProfileAction(formData: FormData) {
   return { success: true, message: 'Profil berhasil diperbarui' };
 }
 
+// ===================================
+// CERTIFICATE MANAGEMENT ACTIONS
+// ===================================
+
 export async function uploadCertificateAction(formData: FormData) {
   const { error: authError } = await requireAdmin();
   if (authError) return { error: authError };
 
-  const userId = sanitizeInput(formData.get('userId') as string, 50);
-  const title = sanitizeInput(formData.get('title') as string, 200);
+  const userId = sanitizeInput(formData. get('userId') as string, 50);
+  const title = sanitizeInput(formData. get('title') as string, 200);
   const expiryDate = sanitizeInput(formData.get('expiryDate') as string, 20);
   const files = formData
     .getAll('file')
@@ -249,7 +312,7 @@ export async function uploadCertificateAction(formData: FormData) {
   }
 
   // Validate file extensions
-  if (files.some((f) => !f.name.toLowerCase().endsWith('.pdf'))) {
+  if (files.some((f) => ! f.name.toLowerCase().endsWith('.pdf'))) {
     return { error: 'File harus berformat PDF' };
   }
 
@@ -292,8 +355,8 @@ export async function uploadCertificateAction(formData: FormData) {
       
       writtenFiles.push(fileName);
 
-      const certTitle = files.length > 1 ? `${title} (${i + 1})` : title;
-      const certificate: Certificate = {
+      const certTitle = files. length > 1 ? `${title} (${i + 1})` : title;
+      const certificate:  Certificate = {
         id: generateCertificateId(),
         title: certTitle,
         file: fileName,
@@ -310,7 +373,7 @@ export async function uploadCertificateAction(formData: FormData) {
       }
     }
   } catch (error) {
-    // Rollback: delete written files
+    // Rollback:  delete written files
     for (const fileName of writtenFiles) {
       try {
         await deleteCertificateFile(fileName);
@@ -322,7 +385,7 @@ export async function uploadCertificateAction(formData: FormData) {
 
   revalidatePath('/admin/users');
   revalidatePath('/admin/upload-certificate');
-  return { success: true, message: `Sertifikat berhasil diupload (${newCertificates.length} file)` };
+  return { success:  true, message: `Sertifikat berhasil diupload (${newCertificates.length} file)` };
 }
 
 export async function deleteCertificateAction(formData: FormData) {
@@ -332,7 +395,7 @@ export async function deleteCertificateAction(formData: FormData) {
   const userId = sanitizeInput(formData.get('userId') as string, 50);
   const certId = sanitizeInput(formData.get('certId') as string, 50);
 
-  if (!userId || !certId) {
+  if (!userId || ! certId) {
     return { error: 'Data tidak valid' };
   }
 
@@ -355,7 +418,7 @@ export async function deleteCertificateAction(formData: FormData) {
   const saved = await deleteCertificate(certId);
 
   if (!saved) {
-    return { error: 'Gagal menghapus sertifikat' };
+    return { error:  'Gagal menghapus sertifikat' };
   }
 
   revalidatePath('/admin/users');

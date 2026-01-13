@@ -19,7 +19,7 @@ export async function getUsers(): Promise<User[]> {
     const supabase = getSupabaseClient(); // Public client for read
     
     const { data: dbUsers, error } = await supabase
-      . from('users')
+      .from('users')
       .select('*')
       .order('created_at', { ascending: true });
 
@@ -56,7 +56,7 @@ export async function getUserById(id: string): Promise<User | undefined> {
   try {
     const supabase = getSupabaseClient(); // Public client for read
     
-    const { data: dbUser, error } = await supabase
+    const { data:  dbUser, error } = await supabase
       .from('users')
       .select('*')
       .eq('id', id)
@@ -68,7 +68,7 @@ export async function getUserById(id: string): Promise<User | undefined> {
     }
 
     // Get user's certificates
-    const { data: dbCertificates } = await supabase
+    const { data:  dbCertificates } = await supabase
       .from('certificates')
       .select('*')
       .eq('user_id', id);
@@ -132,12 +132,14 @@ export async function addUser(user: User): Promise<boolean> {
     const { error } = await supabase
       .from('users')
       .insert({
-        id: user. id,
+        id: user.id,
         email: user.email,
         name: user.name,
         password_hash: user.password,
         role: user.role,
-        status: user.status,
+        posisi: user.posisi,
+        periode_start: user.periode_start,
+        periode_end: user.periode_end,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
@@ -166,9 +168,11 @@ export async function updateUser(id: string, updates: Partial<User>): Promise<bo
     };
 
     if (updates.name) updateData.name = updates.name;
-    if (updates.email) updateData.email = updates. email;
-    if (updates. password) updateData.password_hash = updates.password;
-    if (updates.status) updateData.status = updates. status;
+    if (updates.email) updateData.email = updates.email;
+    if (updates.password) updateData.password_hash = updates. password;
+    if (updates. posisi) updateData.posisi = updates.posisi;
+    if (updates.periode_start) updateData.periode_start = updates. periode_start;
+    if (updates.periode_end) updateData.periode_end = updates.periode_end;
     if (updates.role) updateData.role = updates.role;
 
     const { error } = await supabase
@@ -181,7 +185,7 @@ export async function updateUser(id: string, updates: Partial<User>): Promise<bo
       return false;
     }
 
-    console. log('✅ [DATA-KV] User updated successfully');
+    console.log('✅ [DATA-KV] User updated successfully');
     return true;
   } catch (error) {
     console.error('❌ [DATA-KV] Exception in updateUser:', error);
@@ -193,7 +197,7 @@ export async function deleteUser(id: string): Promise<boolean> {
   try {
     const supabase = getSupabaseAdmin(); // Admin client for write
     
-    console. log('🗑️ [DATA-KV] Deleting user:', id);
+    console.log('🗑️ [DATA-KV] Deleting user:', id);
     
     // Delete user (certificates will be cascade deleted by database FK constraint)
     const { error } = await supabase
@@ -206,7 +210,7 @@ export async function deleteUser(id: string): Promise<boolean> {
       return false;
     }
 
-    console.log('✅ [DATA-KV] User deleted successfully');
+    console. log('✅ [DATA-KV] User deleted successfully');
     return true;
   } catch (error) {
     console.error('❌ [DATA-KV] Exception in deleteUser:', error);
@@ -247,15 +251,15 @@ export async function addCertificate(userId: string, certificate: Certificate): 
     }
     
     const { error } = await supabase
-      . from('certificates')
+      .from('certificates')
       .insert({
         id: certificate.id,
         user_id: userId,
         cert_number: certificate.id, // Use cert ID as cert number
         intern_name:  intern_name,
         position:  position,
-        start_date:  certificate.issuedAt,
-        end_date: certificate.expiryDate || certificate.issuedAt,
+        start_date: certificate.issuedAt,
+        end_date:  certificate.expiryDate || certificate.issuedAt,
         pdf_url: certificate.file,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -274,7 +278,7 @@ export async function addCertificate(userId: string, certificate: Certificate): 
   }
 }
 
-export async function deleteCertificate(certId: string): Promise<boolean> {
+export async function deleteCertificate(certId:  string): Promise<boolean> {
   try {
     const supabase = getSupabaseAdmin(); // Admin client for write
     
