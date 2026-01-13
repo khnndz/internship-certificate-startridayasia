@@ -142,3 +142,16 @@ export function formatPeriode(start: string, end: string): string {
     return '-';
   }
 }
+
+/**
+ * Get public URL untuk certificate dari Supabase Storage
+ */
+export function getCertificatePublicUrl(fileName: string): string {
+  const supabase = getSupabaseClient();
+  
+  const { data } = supabase.storage
+    .from('certificates')
+    .getPublicUrl(fileName);
+  
+  return data.publicUrl;
+}

@@ -5,6 +5,7 @@ import { useState, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@/lib/types';
 import { uploadCertificateAction } from '@/app/actions/admin';
+import { getCertificatePublicUrl } from '@/lib/supabase';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -290,12 +291,10 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                                 )}
                               </div>
                               <a
-  href={`/api/download/${cert.file}`}
-  target="_blank"
-  rel="noopener noreferrer"
->
-  Lihat
-</a>
+                                href={getCertificatePublicUrl(cert.file)}
+                                rel="noopener noreferrer"
+                                className="text-xs font-medium text-primary-600 hover:text-primary-700"
+                              >
                                 Lihat
                               </a>
                             </div>
