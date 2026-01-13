@@ -21,7 +21,7 @@ export default async function AdminDashboardPage() {
 
   const totalUsers = users.filter(u => u.role === 'user').length;
   const totalCertificates = activeCertificates.length;
-  const activeUsers = users.filter(u => u.status === 'Aktif' && u.role === 'user').length;
+  const activeUsers = users.filter(u => u. role === 'user').length;
 
   return (
     <div className="space-y-8">
