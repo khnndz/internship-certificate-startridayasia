@@ -1,11 +1,48 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// ===================================
+// DUAL CLIENT PATTERN
+// ===================================
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Public client (anon key) - Read-only via RLS
+export function getSupabaseClient() {
+  const supabaseUrl = process.env. NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env. NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Types for database tables
+  if (!supabaseUrl || ! supabaseKey) {
+    console.error('❌ Supabase public env vars not set!')
+    throw new Error('Supabase public configuration missing.  Check .env.local file.')
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
+}
+
+// Admin client (service_role key) - Full access
+export function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    console.error('❌ Supabase admin env vars not set!')
+    console.error('Make sure SUPABASE_SERVICE_ROLE_KEY is in .env.local')
+    throw new Error('Supabase admin configuration missing.')
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth:  {
+      autoRefreshToken:  false,
+      persistSession: false
+    }
+  })
+}
+
+// Export default public client for convenience
+export const supabase = getSupabaseClient()
+
+// ===================================
+// DATABASE TYPES
+// ===================================
+
 export type DbUser = {
   id: string
   email: string
@@ -21,22 +58,25 @@ export type DbCertificate = {
   id: string
   user_id: string
   cert_number: string
-  intern_name: string
+  intern_name:  string
   position: string
   start_date: string
   end_date: string
   pdf_url: string
   created_at: string
-  updated_at: string
+  updated_at:  string
 }
 
-// Legacy types for compatibility with existing code
+// ===================================
+// LEGACY TYPES (for compatibility)
+// ===================================
+
 export interface Certificate {
   id: string;
   title: string;
   file: string;
   issuedAt: string;
-  expiryDate?: string;
+  expiryDate?:  string;
 }
 
 export interface User {
@@ -48,6 +88,10 @@ export interface User {
   status: string;
   certificates: Certificate[];
 }
+
+// ===================================
+// CONVERSION HELPERS
+// ===================================
 
 // Helper to convert DB certificate to legacy format
 export function dbCertificateToLegacy(dbCert: DbCertificate): Certificate {
@@ -62,14 +106,14 @@ export function dbCertificateToLegacy(dbCert: DbCertificate): Certificate {
     title: `${dbCert.position} - ${dbCert.intern_name}`,
     file: fileName,
     issuedAt: dbCert.start_date,
-    expiryDate: dbCert.end_date,
+    expiryDate:  dbCert.end_date,
   }
 }
 
 // Helper to convert DB user to legacy format
 export function dbUserToLegacy(dbUser: DbUser, certificates: Certificate[] = []): User {
   return {
-    id: dbUser.id,
+    id: dbUser. id,
     name: dbUser.name,
     email: dbUser.email,
     password: dbUser.password_hash,
