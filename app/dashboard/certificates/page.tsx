@@ -48,45 +48,6 @@ export default async function CertificatesPage() {
         {/* Certificate Display */}
         {certificates.length > 0 ?  (
           <section className="space-y-6">
-            {/* Certificate Info Card */}
-            <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    📜 {certificates[0].title}
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    <strong>Issued:</strong> {new Date(certificates[0].issuedAt).toLocaleDateString('id-ID', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </p>
-                  {certificates[0].expiryDate && (
-                    <p className="text-sm text-gray-600">
-                      <strong>Valid until:</strong> {new Date(certificates[0].expiryDate).toLocaleDateString('id-ID', {
-                        year:  'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                  )}
-                </div>
-                <div className="flex gap-3">
-                  <a 
-                    href={pdfUrl} 
-                    download={certificates[0].file}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="primary">
-                      📥 Download
-                    </Button>
-                  </a>
-                </div>
-              </div>
-            </Card>
-
             {/* PDF Preview */}
             <Card className="overflow-hidden border-2 border-gray-200">
               <div className="bg-gray-100 p-4 border-b border-gray-200">
@@ -101,7 +62,7 @@ export default async function CertificatesPage() {
               </div>
             </Card>
 
-            {/* Download Button Bottom */}
+            {/* Download Button */}
             <div className="flex justify-center pt-4">
               <a 
                 href={pdfUrl} 
