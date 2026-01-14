@@ -35,7 +35,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
       if (result.error) {
         showMessage('error', result.error);
       } else {
-        showMessage('success', result.message || 'Sertifikat berhasil diupload');
+        showMessage('success', result.message || 'Certificate successfully uploaded');
         const form = document.getElementById('upload-form') as HTMLFormElement;
         form?.reset();
         setSelectedFiles([]);
@@ -43,7 +43,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
       }
     } catch (error) {
       console.error('Upload error:', error);
-      showMessage('error', 'Terjadi kesalahan saat upload');
+      showMessage('error', 'An error occurred during upload');
     } finally {
       setUploading(false);
     }
@@ -65,8 +65,8 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Upload Sertifikat</h1>
-          <p className="text-slate-600 text-sm">Upload dan assign sertifikat ke user magang.</p>
+          <h1 className="text-4xl lg:text-5xl font-bold text-[#4791EA]">Upload Certificate</h1>
+          <p className="text-slate-600 text-sm mt-2">Upload and assign certificates to intern users.</p>
         </div>
       </div>
 
@@ -86,9 +86,9 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <span className="text-xl">📤</span> Form Upload Sertifikat
+                  <span className="text-xl">📤</span> Certificate Upload Form
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">Lengkapi data di bawah ini untuk upload sertifikat PDF.</p>
+                <p className="text-xs text-slate-500 mt-1">Complete the form below to upload certificate PDF.</p>
               </div>
             </div>
             <div className="p-6 space-y-5">
@@ -98,13 +98,13 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                 onSubmit={(e) => {
                   if (!selectedUserId) {
                     e.preventDefault();
-                    showMessage('error', 'Silakan pilih user dari hasil pencarian');
+                    showMessage('error', 'Please select a user from search results');
                   }
                 }}
                 className="space-y-5"
               >
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Pilih User</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Select User</label>
                   <input type="hidden" name="userId" value={selectedUserId} />
                   <input
                     type="text"
@@ -120,7 +120,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                     onFocus={() => setShowUserDropdown(true)}
                     autoComplete="off"
                     className="w-full rounded-lg border-2 border-slate-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm mb-2 bg-slate-50"
-                    placeholder="Cari nama atau email..."
+                    placeholder="Search name or email..."
                   />
                   {showUserDropdown && (
                     <div className="max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-md text-sm">
@@ -146,29 +146,29 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                           );
                         })
                       ) : (
-                        <div className="px-3 py-2 text-slate-500">Tidak ada user ditemukan</div>
+                        <div className="px-3 py-2 text-slate-500">No user found</div>
                       )}
                     </div>
                   )}
                   {selectedUserId && (
-                    <p className="mt-1 text-xs text-green-600">User terpilih akan menjadi penerima sertifikat.</p>
+                    <p className="mt-1 text-xs text-green-600">Selected user will receive the certificate.</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Judul Sertifikat</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Certificate Title</label>
                   <input 
                     type="text" 
                     name="title" 
                     required 
                     className="w-full rounded-lg border-2 border-slate-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm bg-white"
-                    placeholder="Contoh: Sertifikat Magang Backend"
+                    placeholder="e.g., Backend Internship Certificate"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1">
-                    Tanggal Kadaluarsa (Opsional)
+                    Expiry Date (Optional)
                   </label>
                   <input 
                     type="date" 
@@ -177,7 +177,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                     min={new Date().toISOString().split('T')[0]}
                   />
                   <p className="text-xs text-slate-500 mt-1">
-                    Sertifikat akan otomatis terhapus setelah tanggal ini
+                    Certificate will be automatically deleted after this date
                   </p>
                 </div>
 
@@ -194,7 +194,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                       </svg>
                       <div className="flex text-sm text-gray-600 justify-center">
                         <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
-                          <span>{selectedFiles.length > 0 ? 'Ganti file' : 'Upload file'}</span>
+                          <span>{selectedFiles.length > 0 ? 'Change file' : 'Upload file'}</span>
                           <input
                             id="file-upload"
                             name="file"
@@ -207,13 +207,13 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                           />
                         </label>
                       </div>
-                      <p className="text-xs text-slate-500">PDF hingga 10MB</p>
+                      <p className="text-xs text-slate-500">PDF up to 10MB</p>
                     </div>
                   </div>
 
                   {selectedFiles.length > 0 && (
                     <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
-                      <div className="text-sm font-medium text-slate-900 mb-2">File dipilih</div>
+                      <div className="text-sm font-medium text-slate-900 mb-2">Selected files</div>
                       <div className="space-y-2">
                         {selectedFiles.map((f) => (
                           <div key={`${f.name}-${f.lastModified}`} className="flex items-center justify-between gap-2 text-sm">
@@ -234,7 +234,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                   disabled={uploading}
                   className="w-full bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 text-white shadow-lg"
                 >
-                  {uploading ? '⏳ Mengupload...' : '📤 Upload Sertifikat'}
+                  {uploading ? '⏳ Uploading...' : '📤 Upload Certificate'}
                 </Button>
               </form>
             </div>
@@ -244,7 +244,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
           <Card className="border-slate-200 shadow-lg">
             <div className="p-6 border-b border-slate-100">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <span>📋</span> Daftar Sertifikat User
+                <span>📋</span> User Certificates List
               </h3>
             </div>
             <div className="p-6 space-y-3 max-h-[480px] overflow-y-auto">
@@ -278,7 +278,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
 
                     <div className="px-4 pb-4">
                       {certCount === 0 ? (
-                        <div className="text-sm text-gray-500">Belum ada sertifikat.</div>
+                        <div className="text-sm text-gray-500">No certificates yet.</div>
                       ) : (
                         <div className="space-y-2">
                           {user.certificates!.map((cert) => (
@@ -287,7 +287,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                                 <p className="text-sm font-medium text-gray-900 truncate" title={cert.title}>{cert.title}</p>
                                 <p className="text-xs text-gray-500 truncate">{cert.file}</p>
                                 {cert.expiryDate && (
-                                  <p className="text-xs text-amber-600 mt-0.5">Berlaku sampai: {cert.expiryDate}</p>
+                                  <p className="text-xs text-amber-600 mt-0.5">Valid until: {cert.expiryDate}</p>
                                 )}
                               </div>
                               <a
@@ -308,7 +308,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
 
               {regularUsers.length === 0 && (
                 <div className="text-center py-10 text-gray-500">
-                  <p>Belum ada user terdaftar</p>
+                  <p>No users registered yet</p>
                 </div>
               )}
             </div>

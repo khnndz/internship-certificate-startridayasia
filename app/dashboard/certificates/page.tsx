@@ -30,7 +30,7 @@ export default async function CertificatesPage() {
 
       {/* Page Header */}
       <section className="text-center mb-8">
-        <h1 className="text-4xl sm:text-5xl font-bold text-[#4791EA] mb-4">
+        <h1 className="text-4xl lg:text-5xl font-bold text-[#4791EA] mb-4">
           Internship Certificate
         </h1>
         <p className="text-base sm:text-lg text-gray-600">

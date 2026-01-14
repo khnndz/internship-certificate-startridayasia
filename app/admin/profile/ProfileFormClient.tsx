@@ -24,11 +24,11 @@ export default function ProfileFormClient({ user }: ProfileFormClientProps) {
       if (result?.error) {
         setMessage({ type: "error", text: result.error });
       } else {
-        setMessage({ type: "success", text: result.message || "Profil berhasil diperbarui" });
+        setMessage({ type: "success", text: result.message || "Profile successfully updated" });
       }
     } catch (error) {
       console.error("Update profile error:", error);
-      setMessage({ type: "error", text: "Terjadi kesalahan saat update profil" });
+      setMessage({ type: "error", text: "An error occurred while updating profile" });
     } finally {
       setLoading(false);
     }
@@ -37,8 +37,8 @@ export default function ProfileFormClient({ user }: ProfileFormClientProps) {
   return (
     <Card className="border-slate-200 shadow-lg max-w-xl">
       <div className="p-6 border-b border-slate-100">
-        <h1 className="text-2xl font-bold text-slate-900">My Profile</h1>
-        <p className="text-sm text-slate-600 mt-1">Ubah data akun admin Anda.</p>
+        <h1 className="text-4xl lg:text-5xl font-bold text-[#4791EA]">My Profile</h1>
+        <p className="text-sm text-slate-600 mt-1">Update your admin account information.</p>
       </div>
       <div className="p-6 space-y-5">
         {message && (
@@ -55,7 +55,7 @@ export default function ProfileFormClient({ user }: ProfileFormClientProps) {
 
         <form action={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Nama Lengkap</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Full Name</label>
             <input
               type="text"
               name="name"
@@ -77,14 +77,14 @@ export default function ProfileFormClient({ user }: ProfileFormClientProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Password Baru (opsional)</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">New Password (optional)</label>
             <input
               type="password"
               name="password"
-              placeholder="Kosongkan jika tidak ingin mengganti"
+              placeholder="Leave blank to keep current password"
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:bg-white outline-none transition-all duration-200"
             />
-            <p className="text-xs text-slate-500 mt-1">Jika diisi, password akan diganti dengan nilai baru.</p>
+            <p className="text-xs text-slate-500 mt-1">If filled, password will be changed to the new value.</p>
           </div>
 
           <Button
@@ -92,7 +92,7 @@ export default function ProfileFormClient({ user }: ProfileFormClientProps) {
             disabled={loading}
             className="w-full bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 text-white shadow-lg"
           >
-            {loading ? "Menyimpan..." : "Simpan Perubahan"}
+            {loading ? "Saving..." : "Save Changes"}
           </Button>
         </form>
       </div>

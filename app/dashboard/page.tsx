@@ -27,7 +27,7 @@ export default async function CertificatesLandingPage() {
     <div className="max-w-6xl mx-auto fade-in-up">
       {/* Welcome Section */}
       <section className="text-center mb-12">
-        <h1 className="text-4xl sm:text-5xl font-bold text-[#4791EA] mb-4">
+        <h1 className="text-4xl lg:text-5xl font-bold text-[#4791EA] mb-4">
           Welcome, {user.name} 👋
         </h1>
         <p className="text-xl sm:text-2xl font-medium text-[#0A0909]">
