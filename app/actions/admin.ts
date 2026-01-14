@@ -59,37 +59,37 @@ export async function createUserAction(formData:  FormData) {
 
   // Validation
   if (!name || !email || !password) {
-    return { error: 'Nama, email, dan password harus diisi' };
+    return { error: 'Name, email, and password are required' };
   }
 
   if (!isValidEmail(email)) {
-    return { error:  'Format email tidak valid' };
+    return { error:  'Invalid email format' };
   }
 
   if (password.length < 6 || password.length > 128) {
-    return { error:  'Password harus 6-128 karakter' };
+    return { error:  'Password must be 6-128 characters' };
   }
 
   if (!posisi) {
-    return { error: 'Posisi/divisi harus diisi' };
+    return { error: 'Position/division is required' };
   }
 
   if (!periode_start || !periode_end) {
-    return { error: 'Periode magang harus diisi (tanggal mulai dan selesai)' };
+    return { error: 'Internship period is required (start and end dates)' };
   }
 
   if (!isValidDate(periode_start) || !isValidDate(periode_end)) {
-    return { error: 'Format tanggal tidak valid' };
+    return { error: 'Invalid date format' };
   }
 
   if (new Date(periode_start) > new Date(periode_end)) {
-    return { error: 'Tanggal mulai harus sebelum tanggal selesai' };
+    return { error: 'Start date must be before end date' };
   }
 
   const users = await getUsers();
   
-  if (users.some(u => u.email. toLowerCase() === email.toLowerCase())) {
-    return { error: 'Email sudah terdaftar' };
+  if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+    return { error: 'Email already registered' };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -108,12 +108,12 @@ export async function createUserAction(formData:  FormData) {
 
   const saved = await addUser(newUser);
 
-  if (! saved) {
-    return { error: 'Gagal menyimpan user' };
+  if (!saved) {
+    return { error: 'Failed to save user' };
   }
 
   revalidatePath('/admin/users');
-  return { success: true, message: 'User berhasil ditambahkan' };
+  return { success: true, message: 'User successfully added' };
 }
 
 export async function updateUserAction(formData: FormData) {
@@ -129,34 +129,34 @@ export async function updateUserAction(formData: FormData) {
   const periode_end = sanitizeInput(formData.get('periode_end') as string, 20);
 
   if (!id || !name || !email) {
-    return { error: 'Data tidak lengkap' };
+    return { error: 'Incomplete data' };
   }
 
   if (!isValidEmail(email)) {
-    return { error:  'Format email tidak valid' };
+    return { error:  'Invalid email format' };
   }
 
   if (password && (password.length < 6 || password.length > 128)) {
-    return { error: 'Password harus 6-128 karakter' };
+    return { error: 'Password must be 6-128 characters' };
   }
 
-  if (periode_start && ! isValidDate(periode_start)) {
-    return { error: 'Format tanggal mulai tidak valid' };
+  if (periode_start && !isValidDate(periode_start)) {
+    return { error: 'Invalid start date format' };
   }
 
   if (periode_end && !isValidDate(periode_end)) {
-    return { error:  'Format tanggal selesai tidak valid' };
+    return { error:  'Invalid end date format' };
   }
 
   if (periode_start && periode_end && new Date(periode_start) > new Date(periode_end)) {
-    return { error: 'Tanggal mulai harus sebelum tanggal selesai' };
+    return { error: 'Start date must be before end date' };
   }
 
   const users = await getUsers();
   const userIndex = users.findIndex(u => u.id === id);
 
   if (userIndex === -1) {
-    return { error:  'User tidak ditemukan' };
+    return { error:  'User not found' };
   }
 
   const emailExists = users.some(
@@ -164,7 +164,7 @@ export async function updateUserAction(formData: FormData) {
   );
   
   if (emailExists) {
-    return { error: 'Email sudah digunakan user lain' };
+    return { error: 'Email already used by another user' };
   }
 
   const updates:  Partial<User> = {
@@ -177,18 +177,18 @@ export async function updateUserAction(formData: FormData) {
   if (periode_end) updates.periode_end = periode_end;
 
   if (password) {
-    const hashedPassword = await bcrypt. hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     updates.password = hashedPassword;
   }
 
   const saved = await updateUser(id, updates);
 
   if (!saved) {
-    return { error: 'Gagal menyimpan perubahan' };
+    return { error: 'Failed to save changes' };
   }
 
   revalidatePath('/admin/users');
-  return { success: true, message:  'User berhasil diupdate' };
+  return { success: true, message:  'User successfully updated' };
 }
 
 export async function deleteUserAction(formData:  FormData) {
@@ -198,19 +198,19 @@ export async function deleteUserAction(formData:  FormData) {
   const id = sanitizeInput(formData.get('id') as string, 50);
 
   if (!id) {
-    return { error:  'ID user tidak valid' };
+    return { error:  'Invalid user ID' };
   }
 
   // Prevent admin from deleting themselves
   if (session?.id === id) {
-    return { error: 'Tidak dapat menghapus akun sendiri' };
+    return { error: 'Cannot delete your own account' };
   }
 
   const users = await getUsers();
   const userToDelete = users.find(u => u.id === id);
 
   if (!userToDelete) {
-    return { error: 'User tidak ditemukan' };
+    return { error: 'User not found' };
   }
 
   // Delete certificate files from storage
@@ -230,11 +230,11 @@ export async function deleteUserAction(formData:  FormData) {
   const saved = await deleteUser(id);
 
   if (!saved) {
-    return { error: 'Gagal menghapus user' };
+    return { error: 'Failed to delete user' };
   }
 
   revalidatePath('/admin/users');
-  return { success: true, message:  'User berhasil dihapus' };
+  return { success: true, message:  'User successfully deleted' };
 }
 
 // ===================================
@@ -253,14 +253,14 @@ export async function updateAdminProfileAction(formData: FormData) {
   const password = (formData.get('password') as string) || '';
 
   if (!name || !email) {
-    return { error: 'Nama dan email wajib diisi' };
+    return { error: 'Name and email are required' };
   }
 
   const users = await getUsers();
   const userIndex = users.findIndex(u => u.id === session.id);
 
   if (userIndex === -1) {
-    return { error: 'User tidak ditemukan' };
+    return { error: 'User not found' };
   }
 
   const emailExists = users.some(
@@ -268,7 +268,7 @@ export async function updateAdminProfileAction(formData: FormData) {
   );
 
   if (emailExists) {
-    return { error: 'Email sudah digunakan user lain' };
+    return { error: 'Email already used by another user' };
   }
 
   const updates: Partial<User> = {
@@ -284,12 +284,12 @@ export async function updateAdminProfileAction(formData: FormData) {
   const saved = await updateUser(session.id, updates);
 
   if (!saved) {
-    return { error: 'Gagal menyimpan perubahan profil' };
+    return { error: 'Failed to save profile changes' };
   }
 
   revalidatePath('/admin/profile');
   revalidatePath('/admin');
-  return { success: true, message: 'Profil berhasil diperbarui' };
+  return { success: true, message: 'Profile successfully updated' };
 }
 
 // ===================================
@@ -331,7 +331,7 @@ export async function uploadCertificateAction(formData: FormData) {
   const user = users.find(u => u.id === userId);
 
   if (!user) {
-    return { error: 'User tidak ditemukan' };
+    return { error: 'User not found' };
   }
 
   const timestamp = Date.now();
@@ -380,12 +380,12 @@ export async function uploadCertificateAction(formData: FormData) {
       } catch {}
     }
     console.error('Error saving file:', error);
-    return { error: 'Gagal menyimpan file' };
+    return { error: 'Failed to save file' };
   }
 
   revalidatePath('/admin/users');
   revalidatePath('/admin/upload-certificate');
-  return { success:  true, message: `Sertifikat berhasil diupload (${newCertificates.length} file)` };
+  return { success:  true, message: `Certificate successfully uploaded (${newCertificates.length} file${newCertificates.length > 1 ? 's' : ''})` };
 }
 
 export async function deleteCertificateAction(formData: FormData) {
@@ -395,14 +395,14 @@ export async function deleteCertificateAction(formData: FormData) {
   const userId = sanitizeInput(formData.get('userId') as string, 50);
   const certId = sanitizeInput(formData.get('certId') as string, 50);
 
-  if (!userId || ! certId) {
-    return { error: 'Data tidak valid' };
+  if (!userId || !certId) {
+    return { error: 'Invalid data' };
   }
 
   const certificate = await getCertificateById(certId);
   
   if (!certificate) {
-    return { error: 'Sertifikat tidak ditemukan' };
+    return { error: 'Certificate not found' };
   }
 
   const fileName = certificate.file;
@@ -418,9 +418,9 @@ export async function deleteCertificateAction(formData: FormData) {
   const saved = await deleteCertificate(certId);
 
   if (!saved) {
-    return { error:  'Gagal menghapus sertifikat' };
+    return { error:  'Failed to delete certificate' };
   }
 
   revalidatePath('/admin/users');
-  return { success: true, message: 'Sertifikat berhasil dihapus' };
+  return { success: true, message: 'Certificate successfully deleted' };
 }

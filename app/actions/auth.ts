@@ -10,24 +10,24 @@ export async function loginAction(formData: FormData) {
   const password = formData.get('password') as string;
 
   if (!email || !password) {
-    return { error: 'Email dan password harus diisi' };
+    return { error: 'Email and password are required' };
   }
 
-  // Validasi format email
+  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return { error: 'Format email tidak valid' };
+    return { error: 'Invalid email format' };
   }
 
-  // Batasi panjang input untuk mencegah DoS
+  // Limit input length to prevent DoS
   if (email.length > 255 || password.length > 128) {
-    return { error: 'Input terlalu panjang' };
+    return { error: 'Input too long' };
   }
 
   const user = await getUserByEmail(email);
 
   if (!user) {
-    return { error: 'Email atau password salah' };
+    return { error: 'Invalid email or password' };
   }
 
   let isValidPassword = false;
@@ -39,7 +39,7 @@ export async function loginAction(formData: FormData) {
   }
 
   if (!isValidPassword) {
-    return { error: 'Email atau password salah' };
+    return { error: 'Invalid email or password' };
   }
 
   const token = await createSession({
