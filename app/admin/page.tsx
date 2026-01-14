@@ -13,14 +13,14 @@ export default async function AdminDashboardPage() {
 
   const users = await getUsers();
   
-  // Get all certificates from magang users
-  const magangUsers = users.filter(u => u.role === 'user');
-  const activeCertificates = magangUsers.flatMap(u => u.certificates || []);
+  // Get all certificates from intern users
+  const internUsers = users.filter(u => u.role === 'user');
+  const activeCertificates = internUsers.flatMap(u => u.certificates || []);
 
   // Stats
-  const totalUsers = magangUsers.length;
+  const totalUsers = internUsers.length;
   const totalCertificates = activeCertificates.length;
-  const activeUsers = magangUsers.length;
+  const activeUsers = internUsers.length;
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 fade-in-up">
@@ -94,7 +94,7 @@ export default async function AdminDashboardPage() {
       <MergedUserCertificateForm />
 
       {/* Recent Users Section */}
-      {magangUsers.length > 0 && (
+      {internUsers.length > 0 && (
         <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-lg">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -117,7 +117,7 @@ export default async function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {magangUsers.slice(0, 5).map((user) => (
+                {internUsers.slice(0, 5).map((user) => (
                   <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-4">
                       <div>

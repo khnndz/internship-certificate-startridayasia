@@ -308,23 +308,23 @@ export async function uploadCertificateAction(formData: FormData) {
     .filter((f): f is File => typeof (f as any)?.arrayBuffer === 'function' && typeof (f as any)?.name === 'string');
 
   if (!userId || !title || files.length === 0) {
-    return { error: 'Semua field harus diisi' };
+    return { error: 'All fields are required' };
   }
 
   // Validate file extensions
-  if (files.some((f) => ! f.name.toLowerCase().endsWith('.pdf'))) {
-    return { error: 'File harus berformat PDF' };
+  if (files.some((f) => !f.name.toLowerCase().endsWith('.pdf'))) {
+    return { error: 'File must be in PDF format' };
   }
 
   // Validate file sizes (max 10MB per file)
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   if (files.some((f) => f.size > MAX_FILE_SIZE)) {
-    return { error: 'Ukuran file maksimal 10MB per file' };
+    return { error: 'Maximum file size is 10MB per file' };
   }
 
   // Limit number of files per upload
   if (files.length > 10) {
-    return { error: 'Maksimal 10 file per upload' };
+    return { error: 'Maximum 10 files per upload' };
   }
 
   const users = await getUsers();
