@@ -106,7 +106,6 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
           <Card className="w-full max-w-lg p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <span className="text-2xl">
                 Add Intern User
               </h3>
               <p className="text-sm text-gray-500 mt-1">Create account for new intern</p>
