@@ -21,11 +21,11 @@ export function Button({
 
   const variantClass =
     variant === 'primary'
-      ? 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm hover:shadow-md'
+      ? 'bg-[#4791EA] text-white hover:bg-[#2874d1] focus:ring-[#4791EA] shadow-sm hover:shadow-md'
       : variant === 'secondary'
         ? 'bg-white text-dark-700 border border-dark-200 hover:bg-dark-50 focus:ring-dark-200 shadow-sm'
         : variant === 'outline'
-          ? 'bg-transparent text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-primary-500'
+          ? 'bg-transparent text-[#4791EA] border border-[#4791EA] hover:bg-[#e8f3fd] focus:ring-[#4791EA]'
           : variant === 'danger'
             ? 'bg-danger text-white hover:bg-red-600 focus:ring-red-500 shadow-sm'
             : 'bg-success text-white hover:bg-green-600 focus:ring-green-500 shadow-sm';
