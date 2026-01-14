@@ -57,7 +57,6 @@ export default async function CertificatesPage() {
             <a 
               href={pdfUrl} 
               download={certificates[0].file}
-              target="_blank"
               rel="noopener noreferrer"
             >
               <Button
