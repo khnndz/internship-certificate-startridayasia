@@ -28,18 +28,18 @@ export default async function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
           <div className="text-center fade-in-up">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Start Friday Asia
-              <span className="block mt-2">Internship Certificate Portal</span>
+              Start Friday Asia Brand & Business Strategy Consulting
+              <span className="block mt-2">AI Innovation Internship</span>
             </h1>
             <p className="text-xl sm:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-              Access and download your official internship certificates from Start Friday Asia's Brand & Business Strategy Consulting AI Innovation Program.
+              Access and download your official internship certificates from our comprehensive Brand & Business Strategy Consulting and AI Innovation Program.
             </p>
             <Link href="/login">
               <Button 
                 size="lg" 
                 className="bg-white text-[#4791EA] hover:bg-gray-100 text-lg px-10 py-6 h-auto font-semibold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
               >
-                Access Portal
+                Access Certificate Portal
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -53,7 +53,7 @@ export default async function HomePage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 fade-in">
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0A0909] mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#4791EA] mb-4">
               About Our Internship Program
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -67,7 +67,7 @@ export default async function HomePage() {
       <section className="py-20 bg-[#F5F5F5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0A0909] mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#4791EA] mb-4">
               Program Benefits
             </h2>
           </div>
@@ -127,7 +127,7 @@ export default async function HomePage() {
       {/* CTA Section */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#0A0909] mb-6">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#4791EA] mb-6">
             Ready to Access Your Certificate?
           </h2>
           <p className="text-lg text-gray-600 mb-8">

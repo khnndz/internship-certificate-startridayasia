@@ -60,11 +60,14 @@ export default function LoginPage() {
 
           {/* Title */}
           <section className="text-center mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0A0909] mb-3">
-              Welcome Back
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#4791EA] mb-4 leading-tight">
+              Certificate Management Portal
             </h1>
+            <h2 className="text-xl sm:text-2xl font-semibold text-[#0A0909] mb-3">
+              Start Friday Asia Brand & Business Strategy Consulting AI Innovation Internship
+            </h2>
             <p className="text-base text-gray-600">
-              Please enter your registered credentials to access the system.
+              Sign in to access your internship certificates
             </p>
           </section>
 

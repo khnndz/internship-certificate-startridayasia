@@ -27,7 +27,7 @@ export default async function AdminDashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#0A0909]">
+          <h1 className="text-4xl lg:text-5xl font-bold text-[#4791EA]">
             Admin Dashboard
           </h1>
           <p className="text-gray-600 mt-2">Manage users and certificates</p>
@@ -98,7 +98,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-lg">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-bold text-[#0A0909]">Recent Users</h2>
+              <h2 className="text-2xl font-semibold text-[#4791EA]">Recent Users</h2>
               <p className="text-sm text-gray-600 mt-1">Latest registered interns</p>
             </div>
             <Link href="/admin/users" className="text-[#4791EA] hover:text-[#2874d1] font-medium text-sm transition-colors">
