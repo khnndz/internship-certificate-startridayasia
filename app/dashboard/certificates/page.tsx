@@ -25,12 +25,12 @@ export default async function CertificatesPage() {
     <div className="max-w-6xl mx-auto fade-in-up">
       {/* Back Button */}
       <div className="mb-6">
-        <BackButton href="/dashboard" label="Back to Dashboard" />
+        <BackButton href="/dashboard" label="Back" />
       </div>
 
       {/* Page Header */}
       <section className="text-center mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-[#4791EA] mb-3">
+        <h1 className="text-4xl sm:text-5xl font-bold text-[#4791EA] mb-4">
           Internship Certificate
         </h1>
         <p className="text-base sm:text-lg text-gray-600">
