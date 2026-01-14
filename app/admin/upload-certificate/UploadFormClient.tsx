@@ -28,9 +28,30 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
     setTimeout(() => setMessage(null), 5000);
   };
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!selectedUserId) {
+      showMessage('error', 'Please select a user from search results');
+      return;
+    }
+
+    if (selectedFiles.length === 0) {
+      showMessage('error', 'Please select at least one file');
+      return;
+    }
+
     setUploading(true);
     try {
+      const formData = new FormData();
+      formData.append('userId', selectedUserId);
+      formData.append('title', (document.querySelector('input[name="title"]') as HTMLInputElement)?.value || '');
+      formData.append('expiryDate', (document.querySelector('input[name="expiryDate"]') as HTMLInputElement)?.value || '');
+
+      for (const file of selectedFiles) {
+        formData.append('file', file);
+      }
+
       const result = await uploadCertificateAction(formData);
       if (result.error) {
         showMessage('error', result.error);
@@ -39,6 +60,8 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
         const form = document.getElementById('upload-form') as HTMLFormElement;
         form?.reset();
         setSelectedFiles([]);
+        setUserSearch('');
+        setSelectedUserId('');
         router.refresh();
       }
     } catch (error) {
@@ -94,13 +117,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
             <div className="p-6 space-y-5">
               <form
                 id="upload-form"
-                action={handleSubmit}
-                onSubmit={(e) => {
-                  if (!selectedUserId) {
-                    e.preventDefault();
-                    showMessage('error', 'Please select a user from search results');
-                  }
-                }}
+                onSubmit={handleSubmit}
                 className="space-y-5"
               >
                 <div>
