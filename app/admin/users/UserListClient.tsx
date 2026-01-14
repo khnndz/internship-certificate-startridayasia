@@ -8,6 +8,7 @@ import { formatPeriode } from '@/lib/supabase';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PasswordInput } from '@/components/ui/PasswordInput';
+import { BackButton } from '@/components/ui/BackButton';
 
 interface UserListClientProps {
   users: User[];
