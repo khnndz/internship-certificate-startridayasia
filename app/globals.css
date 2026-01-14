@@ -82,6 +82,20 @@ body {
     animation: fadeInDown 0.6s ease-out;
   }
 
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    transition: all 0.2s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
   /* Scale animations */
   .scale-hover {
     transition: transform 0.2s ease-in-out;
@@ -100,6 +114,20 @@ body {
     animation: slideInLeft 0.3s ease-out;
   }
 
+  .slide-in-down {
+    animation: slideInDown 0.3s ease-out;
+  }
+
+  /* Scroll animations */
+  .scroll-animate {
+    opacity: 0;
+    animation: slideInUp 0.6s ease forwards;
+  }
+
+  .animate-on-scroll {
+    opacity: 0;
+  }
+
   /* Header scroll animations */
   .header-hidden {
     transform: translateY(-100%);
@@ -110,6 +138,15 @@ body {
     transform: translateY(0);
     transition: transform 0.3s ease-in-out;
   }
+}
+
+/* Button scale on hover */
+button {
+  transition: all 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: scale(1.02);
 }
 
 @keyframes blob {
@@ -170,5 +207,27 @@ body {
   }
   to {
     transform: translateX(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

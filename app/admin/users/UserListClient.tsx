@@ -39,7 +39,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
     if (result.error) {
       showMessage('error', result.error);
     } else {
-      showMessage('success', result.message || 'Berhasil');
+      showMessage('success', result.message || 'Success');
       setIsCreating(false);
       router.refresh();
     }
@@ -50,20 +50,20 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
     if (result.error) {
       showMessage('error', result.error);
     } else {
-      showMessage('success', result.message || 'Berhasil');
+      showMessage('success', result.message || 'Success');
       setEditingUser(null);
       router.refresh();
     }
   }
 
   async function handleDelete(formData: FormData) {
-    if (! confirm('Yakin ingin menghapus user ini?  Semua sertifikat user akan ikut terhapus.')) return;
+    if (!confirm('Are you sure you want to delete this user? All user certificates will also be deleted.')) return;
     
     const result = await deleteUserAction(formData);
     if (result.error) {
       showMessage('error', result.error);
     } else {
-      showMessage('success', result.message || 'Berhasil');
+      showMessage('success', result.message || 'Success');
       router.refresh();
     }
   }
@@ -87,14 +87,13 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <span className="text-3xl">👥</span>
-            Kelola User Magang
+          <h1 className="text-4xl lg:text-5xl font-bold text-[#4791EA] flex items-center gap-2">
+            User Management
           </h1>
-          <p className="text-gray-600 mt-1">Manage user magang dan sertifikat mereka</p>
+          <p className="text-gray-600 mt-1">Manage intern users and their certificates</p>
         </div>
         <Button onClick={() => setIsCreating(true)}>
-          <span className="text-lg">+</span> Tambah User
+          <span className="text-lg">+</span> Add User
         </Button>
       </div>
 
@@ -107,16 +106,16 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
             <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                 <span className="text-2xl">👤</span>
-                Tambah User Magang
+                Add Intern User
               </h3>
-              <p className="text-sm text-gray-500 mt-1">Buat akun untuk anak magang baru</p>
+              <p className="text-sm text-gray-500 mt-1">Create account for new intern</p>
             </div>
             <div className="p-5 bg-white max-h-[70vh] overflow-y-auto">
               <form action={handleCreate} className="space-y-4">
                 {/* Nama Lengkap */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nama Lengkap <span className="text-red-500">*</span>
+                    Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -124,7 +123,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                     required
                     autoComplete="name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="Contoh: Ahmad Lazim"
+                    placeholder="e.g., John Smith"
                   />
                 </div>
 
@@ -154,22 +153,22 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                     required
                     autoComplete="new-password"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="Minimal 6 karakter"
+                    placeholder="Minimum 6 characters"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Password akan digunakan untuk login user</p>
+                  <p className="text-xs text-gray-500 mt-1">Password will be used for user login</p>
                 </div>
 
                 {/* Posisi/Divisi */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Posisi/Divisi <span className="text-red-500">*</span>
+                    Position/Division <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     name="posisi"
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="Contoh: Software Engineer, UI/UX Designer, Marketing"
+                    placeholder="e.g., Software Engineer, UI/UX Designer, Marketing"
                   />
                 </div>
 
@@ -177,7 +176,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tanggal Mulai <span className="text-red-500">*</span>
+                      Start Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
@@ -188,7 +187,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tanggal Selesai <span className="text-red-500">*</span>
+                      End Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
@@ -200,13 +199,13 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                 </div>
                 <p className="text-xs text-gray-500 -mt-2 flex items-center gap-1">
                   <span>💡</span>
-                  <span>Klik icon kalender untuk memilih tanggal dengan mudah</span>
+                  <span>Click the calendar icon to easily select dates</span>
                 </p>
 
                 {/* Buttons */}
                 <div className="flex gap-3 pt-2">
                   <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">
-                    💾 Simpan
+                    💾 Save
                   </Button>
                   <Button 
                     type="button" 
@@ -214,7 +213,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                     onClick={() => setIsCreating(false)} 
                     className="flex-1"
                   >
-                    ✖️ Batal
+                    ✖️ Cancel
                   </Button>
                 </div>
               </form>
@@ -243,7 +242,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                 {/* Nama Lengkap */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nama Lengkap <span className="text-red-500">*</span>
+                    Full Name <span className="text-red-500">*</span>
                   </label>
                   <input 
                     type="text" 
@@ -271,28 +270,28 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                 {/* Password */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Password (Opsional)
+                    Password (Optional)
                   </label>
                   <input 
                     type="password" 
                     name="password" 
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
-                    placeholder="Kosongkan jika tidak diubah" 
+                    placeholder="Leave blank to keep current password" 
                   />
-                  <p className="text-xs text-gray-500 mt-1">Isi hanya jika ingin mengubah password</p>
+                  <p className="text-xs text-gray-500 mt-1">Fill only if you want to change the password</p>
                 </div>
                 
                 {/* Posisi/Divisi */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Posisi/Divisi
+                    Position/Division
                   </label>
                   <input 
                     type="text" 
                     name="posisi" 
                     defaultValue={editingUser.posisi}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
-                    placeholder="Contoh: Software Engineer"
+                    placeholder="e.g., Software Engineer"
                   />
                 </div>
                 
@@ -300,7 +299,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tanggal Mulai
+                      Start Date
                     </label>
                     <input 
                       type="date" 
@@ -311,7 +310,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tanggal Selesai
+                      End Date
                     </label>
                     <input 
                       type="date" 
@@ -333,7 +332,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                     onClick={() => setEditingUser(null)}
                     className="flex-1"
                   >
-                    ✖️ Batal
+                    ✖️ Cancel
                   </Button>
                 </div>
               </form>
@@ -353,31 +352,31 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                 <th className="text-left py-3.5 px-5 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <span>👤</span>
-                    <span>Nama & Email</span>
+                    <span>Name & Email</span>
                   </div>
                 </th>
                 <th className="text-left py-3.5 px-5 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <span>💼</span>
-                    <span>Posisi</span>
+                    <span>Position</span>
                   </div>
                 </th>
                 <th className="text-left py-3.5 px-5 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <span>📅</span>
-                    <span>Periode</span>
+                    <span>Period</span>
                   </div>
                 </th>
                 <th className="text-left py-3.5 px-5 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <span>📄</span>
-                    <span>Sertifikat</span>
+                    <span>Certificates</span>
                   </div>
                 </th>
                 <th className="text-right py-3.5 px-5 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <div className="flex items-center justify-end gap-2">
                     <span>⚙️</span>
-                    <span>Aksi</span>
+                    <span>Actions</span>
                   </div>
                 </th>
               </tr>
@@ -440,7 +439,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                           className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
                         >
                           <span className="text-base">🗑️</span>
-                          <span className="ml-1">Hapus</span>
+                          <span className="ml-1">Delete</span>
                         </Button>
                       </form>
                     </div>
@@ -454,13 +453,13 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                   <td colSpan={5} className="py-16 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <div className="text-6xl mb-4">📭</div>
-                      <p className="text-lg font-medium text-gray-700">Belum ada user magang</p>
-                      <p className="text-sm text-gray-500 mt-1">Klik tombol "Tambah User" untuk mulai menambahkan user</p>
+                      <p className="text-lg font-medium text-gray-700">No intern users yet</p>
+                      <p className="text-sm text-gray-500 mt-1">Click "Add User" button to start adding users</p>
                       <Button 
                         onClick={() => setIsCreating(true)}
                         className="mt-4"
                       >
-                        <span className="text-lg">+</span> Tambah User Pertama
+                        <span className="text-lg">+</span> Add First User
                       </Button>
                     </div>
                   </td>

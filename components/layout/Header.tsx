@@ -67,10 +67,10 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 bg-[#4791EA] shadow-md transition-transform duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 bg-[#4791EA] border-b-4 border-[#2874d1] shadow-lg transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
-      style={{ height: '64px' }}
+      style={{ height: '96px' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div className="flex items-center justify-between h-full">
@@ -81,17 +81,17 @@ export function Header({ user }: HeaderProps) {
             rel="noopener noreferrer"
             className="flex items-center gap-3 hover:opacity-90 transition-opacity"
           >
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
+            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center overflow-hidden">
               <Image
                 src="/img/SF_logo.webp"
                 alt="Start Friday Asia"
-                width={40}
-                height={40}
+                width={48}
+                height={48}
                 className="object-cover"
               />
             </div>
-            <span className="text-white font-semibold text-lg hidden sm:block">
-              Start Friday Asia
+            <span className="text-white font-semibold text-xl hidden sm:block">
+              Start Friday
             </span>
           </Link>
 
@@ -105,12 +105,12 @@ export function Header({ user }: HeaderProps) {
               <span className="hidden sm:block text-sm font-medium text-white">
                 {user.name}
               </span>
-              <Avatar name={user.name} size="sm" />
+              <Avatar name={user.name} email={user.email} role={user.role} size="sm" />
             </button>
 
             {/* Dropdown menu */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 slide-in-down">
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 animate-fade-in">
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-sm font-semibold text-gray-900 truncate">
                     {user.name}
@@ -118,7 +118,7 @@ export function Header({ user }: HeaderProps) {
                   <p className="text-xs text-gray-500 truncate">
                     {user.email}
                   </p>
-                  <p className="text-xs text-primary-600 font-medium mt-1 capitalize">
+                  <p className="text-xs text-[#4791EA] font-medium mt-1 capitalize">
                     {user.role}
                   </p>
                 </div>
@@ -128,7 +128,7 @@ export function Header({ user }: HeaderProps) {
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   onClick={() => setIsDropdownOpen(false)}
                 >
-                  Dashboard
+                  Home
                 </Link>
 
                 <Link
@@ -145,7 +145,7 @@ export function Header({ user }: HeaderProps) {
                       type="submit"
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                     >
-                      Logout
+                      Sign Out
                     </button>
                   </form>
                 </div>
