@@ -188,7 +188,7 @@ export async function updateUserAction(formData: FormData) {
   }
 
   revalidatePath('/admin/users');
-  return { success: true, message:  'User successfully updated' };
+  return { success: true, message: 'User successfully updated' };
 }
 
 export async function deleteUserAction(formData:  FormData) {
@@ -234,7 +234,7 @@ export async function deleteUserAction(formData:  FormData) {
   }
 
   revalidatePath('/admin/users');
-  return { success: true, message:  'User successfully deleted' };
+  return { success: true, message: 'User successfully deleted' };
 }
 
 // ===================================
@@ -385,7 +385,7 @@ export async function uploadCertificateAction(formData: FormData) {
 
   revalidatePath('/admin/users');
   revalidatePath('/admin/upload-certificate');
-  return { success:  true, message: `Certificate successfully uploaded (${newCertificates.length} file${newCertificates.length > 1 ? 's' : ''})` };
+  return { success: true, message: `Certificate successfully uploaded (${newCertificates.length} file${newCertificates.length > 1 ? 's' : ''})` };
 }
 
 export async function deleteCertificateAction(formData: FormData) {
@@ -418,7 +418,7 @@ export async function deleteCertificateAction(formData: FormData) {
   const saved = await deleteCertificate(certId);
 
   if (!saved) {
-    return { error:  'Failed to delete certificate' };
+    return { error: 'Failed to delete certificate' };
   }
 
   revalidatePath('/admin/users');
