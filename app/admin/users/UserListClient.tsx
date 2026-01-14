@@ -85,6 +85,11 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
         </div>
       )}
 
+      {/* Back button */}
+      <div className="mb-6">
+        <BackButton href="/dashboard" label="Back" />
+      </div> 
+      
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
