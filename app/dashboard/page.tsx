@@ -35,44 +35,6 @@ export default async function CertificatesLandingPage() {
         </p>
       </section>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-        <div className="bg-gradient-to-br from-[#4791EA] to-[#2874d1] rounded-xl p-8 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-white/80 mb-1">Total Certificates</p>
-              <p className="text-4xl font-bold">{certificateCount}</p>
-            </div>
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border-2 border-gray-200 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Latest Certificate</p>
-              <p className="text-lg font-semibold text-[#0A0909]">
-                {latestCertificate ? latestCertificate.title : 'No certificates yet'}
-              </p>
-              {latestCertificate && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Issued: {new Date(latestCertificate.issuedAt).toLocaleDateString()}
-                </p>
-              )}
-            </div>
-            <div className="w-16 h-16 bg-[#e8f3fd] rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-[#4791EA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Content Section */}
       <section className="bg-white rounded-xl border-2 border-gray-200 p-8 sm:p-10 mb-12 shadow-lg">
         <div className="prose prose-lg max-w-none">
