@@ -7,6 +7,7 @@ import { createUserAction, updateUserAction, deleteUserAction } from '@/app/acti
 import { formatPeriode } from '@/lib/supabase';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 
 interface UserListClientProps {
   users: User[];
@@ -105,7 +106,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
           <Card className="w-full max-w-lg p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <span className="text-2xl">👤</span>
+                <span className="text-2xl">
                 Add Intern User
               </h3>
               <p className="text-sm text-gray-500 mt-1">Create account for new intern</p>
@@ -147,7 +148,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Password <span className="text-red-500">*</span>
                   </label>
-                  <input
+                  <PasswordInput
                     type="password"
                     name="password"
                     required
@@ -198,7 +199,6 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 -mt-2 flex items-center gap-1">
-                  <span>💡</span>
                   <span>Click the calendar icon to easily select dates</span>
                 </p>
 
@@ -272,7 +272,7 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Password (Optional)
                   </label>
-                  <input 
+                  <PasswordInput
                     type="password" 
                     name="password" 
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
@@ -357,7 +357,6 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                 </th>
                 <th className="text-left py-3.5 px-5 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <div className="flex items-center gap-2">
-                    <span>💼</span>
                     <span>Position</span>
                   </div>
                 </th>
@@ -395,7 +394,6 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                   {/* Posisi */}
                   <td className="py-4 px-5">
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                      <span>💼</span>
                       <span>{user.posisi || '-'}</span>
                     </span>
                   </td>
@@ -403,7 +401,6 @@ export default function UserListClient({ users = [] }: UserListClientProps) {  /
                   {/* Periode */}
                   <td className="py-4 px-5">
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      <span>📅</span>
                       <span>{formatPeriode(user.periode_start, user.periode_end)}</span>
                     </span>
                   </td>
