@@ -4,6 +4,7 @@ import { useState } from "react";
 import { updateAdminProfileAction } from "@/app/actions/admin";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { PasswordInput } from '@/components/ui/PasswordInput';
 
 interface ProfileFormClientProps {
   user: {
@@ -78,7 +79,7 @@ export default function ProfileFormClient({ user }: ProfileFormClientProps) {
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">New Password (optional)</label>
-            <input
+            <PasswordInput
               type="password"
               name="password"
               placeholder="Leave blank to keep current password"
