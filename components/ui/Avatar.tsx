@@ -33,7 +33,7 @@ export function Avatar({ name, email, role, size = 'md', className = '' }: Avata
     return (
       <div className={`${sizeConfig.container} rounded-full overflow-hidden bg-white border-2 border-white shadow-md hover:shadow-lg transition-all duration-300 ${className}`}>
         <Image
-          src="/img/SF_logo.webp"
+          src="/img/admin-avatar.webp"
           alt={name}
           width={80}
           height={80}
