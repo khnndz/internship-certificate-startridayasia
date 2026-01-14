@@ -85,7 +85,7 @@ export default async function CertificatesPage() {
           <p className="text-gray-500 max-w-md mx-auto mb-6">
             Your internship certificate is not yet available. Please contact the administrator for more information.
           </p>
-          <BackButton href="/dashboard" label="Back to Dashboard" />
+          <BackButton href="/dashboard" label="Back" />
         </div>
       )}
     </div>
