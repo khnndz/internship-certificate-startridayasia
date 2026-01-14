@@ -61,7 +61,7 @@ export default async function UserProfilePage() {
                 {/* ✅ CHANGED - Show Posisi instead of Status */}
                 {user.posisi && (
                   <Badge variant="secondary">
-                    💼 {user.posisi}
+                    {user.posisi}
                   </Badge>
                 )}
               </div>
