@@ -174,14 +174,14 @@ export function MergedUserCertificateForm() {
 
           {/* Certificate Details Section */}
           <div className="border-t-2 border-gray-200 pt-6 mt-6">
-            <h3 className="text-2xl font-semibold text-[#4791EA] mb-4">Certificate Information (Optional)</h3>
+            <h3 className="text-2xl font-semibold text-[#4791EA] mb-4">Certificate Information</h3>
             <p className="text-sm text-gray-600 mb-6">You can upload the certificate later from the user management page if needed.</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Certificate Title */}
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                  Certificate Title
+                  Certificate Title <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -209,7 +209,7 @@ export function MergedUserCertificateForm() {
             {/* Certificate PDF Upload */}
             <div className="mt-6">
               <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
-                Certificate PDF
+                Certificate PDF <span className="text-red-500">*</span>
               </label>
               <input
                 type="file"
