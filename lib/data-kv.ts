@@ -210,7 +210,7 @@ export async function deleteUser(id: string): Promise<boolean> {
       return false;
     }
 
-    console. log('✅ [DATA-KV] User deleted successfully');
+    console.log('✅ [DATA-KV] User deleted successfully');
     return true;
   } catch (error) {
     console.error('❌ [DATA-KV] Exception in deleteUser:', error);
@@ -245,9 +245,9 @@ export async function addCertificate(userId: string, certificate: Certificate): 
     let position = certificate.title;
     
     if (certificate.title.includes(' - ')) {
-      const parts = certificate. title.split(' - ');
-      position = parts[0]. trim();
-      intern_name = parts. slice(1).join(' - ').trim() || position;
+      const parts = certificate.title.split(' - ');
+      position = parts[0].trim();
+      intern_name = parts.slice(1).join(' - ').trim() || position;
     }
     
     const { error } = await supabase

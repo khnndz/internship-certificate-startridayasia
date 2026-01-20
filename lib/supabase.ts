@@ -18,7 +18,7 @@ export function getSupabaseClient() {
 
 export function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env. SUPABASE_SERVICE_ROLE_KEY
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !serviceRoleKey) {
     console.error('❌ Supabase admin env vars not set!')
@@ -43,9 +43,9 @@ export const supabase = getSupabaseClient()
 export type DbUser = {
   id: string
   email: string
-  name:  string
+  name: string
   password_hash: string
-  role:  'admin' | 'user'
+  role: 'admin' | 'user'
   posisi: string           // ✅ NEW
   periode_start: string    // ✅ NEW
   periode_end: string      // ✅ NEW
@@ -59,7 +59,7 @@ export type DbCertificate = {
   cert_number: string
   intern_name: string
   position: string
-  start_date:  string
+  start_date: string
   end_date: string
   pdf_url: string
   created_at: string
@@ -97,9 +97,9 @@ export interface User {
 export function dbCertificateToLegacy(dbCert: DbCertificate): Certificate {
   let fileName = dbCert.pdf_url;
   if (fileName.includes('/')) {
-    fileName = fileName. split('/').pop() || fileName;
+    fileName = fileName.split('/').pop() || fileName;
   }
-  
+
   return {
     id: dbCert.id,
     title: `${dbCert.position} - ${dbCert.intern_name}`,
@@ -111,7 +111,7 @@ export function dbCertificateToLegacy(dbCert: DbCertificate): Certificate {
 
 export function dbUserToLegacy(dbUser: DbUser, certificates: Certificate[] = []): User {
   return {
-    id: dbUser. id,
+    id: dbUser.id,
     name: dbUser.name,
     email: dbUser.email,
     password: dbUser.password_hash,
@@ -129,14 +129,14 @@ export function dbUserToLegacy(dbUser: DbUser, certificates: Certificate[] = [])
 
 export function formatPeriode(start: string, end: string): string {
   if (!start || !end) return '-';
-  
+
   try {
     const startDate = new Date(start);
     const endDate = new Date(end);
-    
+
     const startMonth = startDate.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
-    const endMonth = endDate. toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
-    
+    const endMonth = endDate.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+
     return `${startMonth} - ${endMonth}`;
   } catch {
     return '-';
@@ -148,10 +148,11 @@ export function formatPeriode(start: string, end: string): string {
  */
 export function getCertificatePublicUrl(fileName: string): string {
   const supabase = getSupabaseClient();
-  
+
   const { data } = supabase.storage
     .from('certificates')
     .getPublicUrl(fileName);
-  
+
   return data.publicUrl;
 }
+

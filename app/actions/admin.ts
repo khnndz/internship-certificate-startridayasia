@@ -34,7 +34,7 @@ function isValidDate(dateString: string): boolean {
 }
 
 // Helper: Check admin session
-async function requireAdmin(): Promise<{ error?:  string; session?: any }> {
+async function requireAdmin(): Promise<{ error?: string; session?: any }> {
   const session = await getSession();
   if (!session || session.role !== 'admin') {
     return { error: 'Unauthorized:  Admin access required' };
@@ -46,8 +46,8 @@ async function requireAdmin(): Promise<{ error?:  string; session?: any }> {
 // USER MANAGEMENT ACTIONS
 // ===================================
 
-export async function createUserAction(formData:  FormData) {
-  const { error:  authError } = await requireAdmin();
+export async function createUserAction(formData: FormData) {
+  const { error: authError } = await requireAdmin();
   if (authError) return { error: authError };
 
   const name = sanitizeInput(formData.get('name') as string, 100);
@@ -63,11 +63,11 @@ export async function createUserAction(formData:  FormData) {
   }
 
   if (!isValidEmail(email)) {
-    return { error:  'Invalid email format' };
+    return { error: 'Invalid email format' };
   }
 
   if (password.length < 6 || password.length > 128) {
-    return { error:  'Password must be 6-128 characters' };
+    return { error: 'Password must be 6-128 characters' };
   }
 
   if (!posisi) {
@@ -87,7 +87,7 @@ export async function createUserAction(formData:  FormData) {
   }
 
   const users = await getUsers();
-  
+
   if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
     return { error: 'Email already registered' };
   }
@@ -113,7 +113,7 @@ export async function createUserAction(formData:  FormData) {
   }
 
   revalidatePath('/admin/users');
-  return { success: true, message: 'User successfully added' };
+  return { success: true, message: 'User successfully added', userId: newUser.id };
 }
 
 export async function updateUserAction(formData: FormData) {
@@ -124,7 +124,7 @@ export async function updateUserAction(formData: FormData) {
   const name = sanitizeInput(formData.get('name') as string, 100);
   const email = sanitizeInput(formData.get('email') as string, 255).toLowerCase();
   const password = formData.get('password') as string;
-  const posisi = sanitizeInput(formData. get('posisi') as string, 100);
+  const posisi = sanitizeInput(formData.get('posisi') as string, 100);
   const periode_start = sanitizeInput(formData.get('periode_start') as string, 20);
   const periode_end = sanitizeInput(formData.get('periode_end') as string, 20);
 
@@ -133,7 +133,7 @@ export async function updateUserAction(formData: FormData) {
   }
 
   if (!isValidEmail(email)) {
-    return { error:  'Invalid email format' };
+    return { error: 'Invalid email format' };
   }
 
   if (password && (password.length < 6 || password.length > 128)) {
@@ -145,7 +145,7 @@ export async function updateUserAction(formData: FormData) {
   }
 
   if (periode_end && !isValidDate(periode_end)) {
-    return { error:  'Invalid end date format' };
+    return { error: 'Invalid end date format' };
   }
 
   if (periode_start && periode_end && new Date(periode_start) > new Date(periode_end)) {
@@ -156,18 +156,18 @@ export async function updateUserAction(formData: FormData) {
   const userIndex = users.findIndex(u => u.id === id);
 
   if (userIndex === -1) {
-    return { error:  'User not found' };
+    return { error: 'User not found' };
   }
 
   const emailExists = users.some(
     u => u.email.toLowerCase() === email.toLowerCase() && u.id !== id
   );
-  
+
   if (emailExists) {
     return { error: 'Email already used by another user' };
   }
 
-  const updates:  Partial<User> = {
+  const updates: Partial<User> = {
     name,
     email,
   };
@@ -191,14 +191,14 @@ export async function updateUserAction(formData: FormData) {
   return { success: true, message: 'User successfully updated' };
 }
 
-export async function deleteUserAction(formData:  FormData) {
+export async function deleteUserAction(formData: FormData) {
   const { error: authError, session } = await requireAdmin();
   if (authError) return { error: authError };
 
   const id = sanitizeInput(formData.get('id') as string, 50);
 
   if (!id) {
-    return { error:  'Invalid user ID' };
+    return { error: 'Invalid user ID' };
   }
 
   // Prevent admin from deleting themselves
@@ -300,8 +300,8 @@ export async function uploadCertificateAction(formData: FormData) {
   const { error: authError } = await requireAdmin();
   if (authError) return { error: authError };
 
-  const userId = sanitizeInput(formData. get('userId') as string, 50);
-  const title = sanitizeInput(formData. get('title') as string, 200);
+  const userId = sanitizeInput(formData.get('userId') as string, 50);
+  const title = sanitizeInput(formData.get('title') as string, 200);
   const expiryDate = sanitizeInput(formData.get('expiryDate') as string, 20);
   const files = formData
     .getAll('file')
@@ -348,24 +348,24 @@ export async function uploadCertificateAction(formData: FormData) {
 
       const buffer = Buffer.from(await file.arrayBuffer());
       const saved = await saveCertificateFile(fileName, buffer);
-      
+
       if (!saved) {
         throw new Error(`Failed to save file: ${fileName}`);
       }
-      
+
       writtenFiles.push(fileName);
 
-      const certTitle = files. length > 1 ? `${title} (${i + 1})` : title;
-      const certificate:  Certificate = {
+      const certTitle = files.length > 1 ? `${title} (${i + 1})` : title;
+      const certificate: Certificate = {
         id: generateCertificateId(),
         title: certTitle,
         file: fileName,
         issuedAt,
         ...(expiryDate && { expiryDate }),
       };
-      
+
       newCertificates.push(certificate);
-      
+
       // Add certificate to database
       const certSaved = await addCertificate(userId, certificate);
       if (!certSaved) {
@@ -377,7 +377,7 @@ export async function uploadCertificateAction(formData: FormData) {
     for (const fileName of writtenFiles) {
       try {
         await deleteCertificateFile(fileName);
-      } catch {}
+      } catch { }
     }
     console.error('Error saving file:', error);
     return { error: 'Failed to save file' };
@@ -400,7 +400,7 @@ export async function deleteCertificateAction(formData: FormData) {
   }
 
   const certificate = await getCertificateById(certId);
-  
+
   if (!certificate) {
     return { error: 'Certificate not found' };
   }

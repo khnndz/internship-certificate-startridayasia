@@ -14,10 +14,11 @@ export function MergedUserCertificateForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget; // Store reference before async operations
     setLoading(true);
     setMessage(null);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
 
     try {
       // Step 1: Create user first
@@ -31,31 +32,55 @@ export function MergedUserCertificateForm() {
 
       // Step 2: If user created successfully, upload certificate (if files provided)
       const files = formData.getAll('file');
-      if (files.length > 0 && files[0] instanceof File && files[0].size > 0) {
-        // We need to get the user ID from the newly created user
-        // Since createUserAction doesn't return the user ID, we'll use email to identify
-        const email = formData.get('email') as string;
-        
+      const title = formData.get('title') as string;
+      const hasFiles = files.length > 0 && files[0] instanceof File && files[0].size > 0;
+      const hasTitle = title && title.trim().length > 0;
+      
+      if (hasFiles && hasTitle && userResult.userId) {
         // Create a new FormData for certificate upload
         const certFormData = new FormData();
-        // We need userId - but we don't have it from the createUserAction
-        // This is a limitation - we'd need to refetch users or modify the action
+        certFormData.append('userId', userResult.userId);
+        certFormData.append('title', title);
+        certFormData.append('expiryDate', formData.get('expiryDate') as string || '');
         
-        // For now, show success message about user creation
+        // Append all files
+        for (const file of files) {
+          if (file instanceof File && file.size > 0) {
+            certFormData.append('file', file);
+          }
+        }
+        
+        const certResult = await uploadCertificateAction(certFormData);
+        
+        if (certResult.error) {
+          // User was created but certificate upload failed
+          setMessage({ 
+            type: 'error', 
+            text: `User created but certificate upload failed: ${certResult.error}` 
+          });
+        } else {
+          setMessage({ 
+            type: 'success', 
+            text: 'User and certificate created successfully!' 
+          });
+        }
+      } else if (hasFiles && !hasTitle) {
         setMessage({ 
           type: 'success', 
-          text: 'User created successfully! Please upload certificate from the user management page.' 
+          text: 'User created! Certificate not uploaded - please provide a title.' 
         });
       } else {
         setMessage({ type: 'success', text: 'User created successfully!' });
       }
 
       // Reset form
-      event.currentTarget.reset();
+      form.reset();
       router.refresh();
 
     } catch (error) {
-      setMessage({ type: 'error', text: 'An unexpected error occurred' });
+      console.error('Form submission error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      setMessage({ type: 'error', text: errorMessage });
     } finally {
       setLoading(false);
     }

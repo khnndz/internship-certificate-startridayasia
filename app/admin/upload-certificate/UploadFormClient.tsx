@@ -1,7 +1,7 @@
 'use client';
 
 import { formatPeriode } from '@/lib/supabase';
-import { useState, type ChangeEvent } from 'react';
+import { useState, useRef, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@/lib/types';
 import { uploadCertificateAction } from '@/app/actions/admin';
@@ -22,6 +22,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
   const [selectedUserId, setSelectedUserId] = useState('');
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
@@ -30,6 +31,8 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    const form = e.currentTarget;
 
     if (!selectedUserId) {
       showMessage('error', 'Please select a user from search results');
@@ -41,12 +44,24 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
       return;
     }
 
+    // Get form values from the submitted form directly
+    const titleInput = form.querySelector('input[name="title"]') as HTMLInputElement;
+    const expiryDateInput = form.querySelector('input[name="expiryDate"]') as HTMLInputElement;
+
+    const title = titleInput?.value || '';
+    const expiryDate = expiryDateInput?.value || '';
+
+    if (!title.trim()) {
+      showMessage('error', 'Certificate title is required');
+      return;
+    }
+
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append('userId', selectedUserId);
-      formData.append('title', (document.querySelector('input[name="title"]') as HTMLInputElement)?.value || '');
-      formData.append('expiryDate', (document.querySelector('input[name="expiryDate"]') as HTMLInputElement)?.value || '');
+      formData.append('title', title);
+      formData.append('expiryDate', expiryDate);
 
       for (const file of selectedFiles) {
         formData.append('file', file);
@@ -57,8 +72,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
         showMessage('error', result.error);
       } else {
         showMessage('success', result.message || 'Certificate successfully uploaded');
-        const form = document.getElementById('upload-form') as HTMLFormElement;
-        form?.reset();
+        formRef.current?.reset();
         setSelectedFiles([]);
         setUserSearch('');
         setSelectedUserId('');
@@ -66,7 +80,8 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
       }
     } catch (error) {
       console.error('Upload error:', error);
-      showMessage('error', 'An error occurred during upload');
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      showMessage('error', errorMessage);
     } finally {
       setUploading(false);
     }
@@ -94,11 +109,10 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
       </div>
 
       {message && (
-        <div className={`p-4 rounded-lg border ${
-          message.type === 'success' 
-            ? 'bg-green-50 text-green-700 border-green-200' 
+        <div className={`p-4 rounded-lg border ${message.type === 'success'
+            ? 'bg-green-50 text-green-700 border-green-200'
             : 'bg-red-50 text-red-700 border-red-200'
-        }`}>
+          }`}>
           {message.text}
         </div>
       )}
@@ -116,6 +130,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
             </div>
             <div className="p-6 space-y-5">
               <form
+                ref={formRef}
                 id="upload-form"
                 onSubmit={handleSubmit}
                 className="space-y-5"
@@ -153,9 +168,8 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                                 setUserSearch(`${user.name} (${user.email})`);
                                 setShowUserDropdown(false);
                               }}
-                              className={`w-full text-left px-3 py-2 flex flex-col hover:bg-primary-50 transition-colors ${
-                                isSelected ? 'bg-primary-50 text-primary-700' : 'text-slate-700'
-                              }`}
+                              className={`w-full text-left px-3 py-2 flex flex-col hover:bg-primary-50 transition-colors ${isSelected ? 'bg-primary-50 text-primary-700' : 'text-slate-700'
+                                }`}
                             >
                               <span className="font-medium truncate">{user.name}</span>
                               <span className="text-xs text-slate-500 truncate">{user.email}</span>
@@ -174,10 +188,10 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1">Certificate Title</label>
-                  <input 
-                    type="text" 
-                    name="title" 
-                    required 
+                  <input
+                    type="text"
+                    name="title"
+                    required
                     className="w-full rounded-lg border-2 border-slate-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm bg-white"
                     placeholder="e.g., Backend Internship Certificate"
                   />
@@ -187,9 +201,9 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                   <label className="block text-sm font-semibold text-slate-700 mb-1">
                     Expiry Date (Optional)
                   </label>
-                  <input 
-                    type="date" 
-                    name="expiryDate" 
+                  <input
+                    type="date"
+                    name="expiryDate"
                     className="w-full rounded-lg border-2 border-slate-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm bg-white"
                     min={new Date().toISOString().split('T')[0]}
                   />
@@ -200,11 +214,10 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1">File PDF</label>
-                  <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg transition-colors ${
-                    selectedFiles.length > 0
+                  <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg transition-colors ${selectedFiles.length > 0
                       ? 'border-primary-300 bg-primary-50'
                       : 'border-slate-200 hover:border-primary-500 bg-slate-50'
-                  }`}>
+                    }`}>
                     <div className="space-y-1 text-center">
                       <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -246,8 +259,8 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                   )}
                 </div>
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={uploading}
                   className="w-full bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 text-white shadow-lg"
                 >
@@ -280,7 +293,7 @@ export default function UploadFormClient({ users }: UploadFormClientProps) {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
-                       <div className="flex items-center gap-2"></div>
+                        <div className="flex items-center gap-2"></div>
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                           <span>💼</span>
                           <span>{user.posisi || '-'}</span>
